@@ -310,6 +310,90 @@ def api_explore():
     return jsonify({'result': result})
 
 
+@app.route('/api/ref/jummal')
+def api_ref_jummal():
+    """آيات بقيمة جُمَّل محددة من مرجع التطبيق"""
+    value = request.args.get('value', type=int)
+    limit = request.args.get('limit', 20, type=int)
+    if value is None:
+        return jsonify({'error': 'value parameter required'}), 400
+    conn = get_db()
+    ayat = conn.execute(
+        "SELECT surah, aya, text_clean, jummal FROM ref_ayat "
+        "WHERE jummal=? ORDER BY surah, aya LIMIT ?",
+        (value, limit)
+    ).fetchall()
+    words = conn.execute(
+        "SELECT word_text, COUNT(*) as cnt FROM ref_words "
+        "WHERE jummal=? GROUP BY word_text ORDER BY cnt DESC LIMIT 15",
+        (value,)
+    ).fetchall()
+    conn.close()
+    return jsonify({
+        'value': value,
+        'digit_root': digit_root(value),
+        'ayat': [{'surah': r[0], 'aya': r[1], 'text': r[2], 'jummal': r[3]} for r in ayat],
+        'words': [{'word': r[0], 'count': r[1]} for r in words],
+    })
+
+
+@app.route('/api/ref/ayah')
+def api_ref_ayah():
+    """بيانات آية من مرجع التطبيق مع كلماتها"""
+    surah = request.args.get('surah', type=int)
+    aya   = request.args.get('aya', type=int)
+    if surah is None or aya is None:
+        return jsonify({'error': 'surah and aya required'}), 400
+    conn = get_db()
+    row = conn.execute(
+        "SELECT aya_global_id, text_clean, text_tashkeel, jummal, word_count, letter_count "
+        "FROM ref_ayat WHERE surah=? AND aya=?", (surah, aya)
+    ).fetchone()
+    if not row:
+        conn.close()
+        return jsonify({'error': 'not found'}), 404
+    gid, text_c, text_t, jum, wc, lc = row
+    words_rows = conn.execute(
+        "SELECT word_pos, word_text, jummal FROM ref_words "
+        "WHERE aya_global_id=? ORDER BY word_pos", (gid,)
+    ).fetchall()
+    conn.close()
+    return jsonify({
+        'surah': surah, 'aya': aya,
+        'text_clean': text_c, 'text_tashkeel': text_t,
+        'jummal': jum, 'digit_root': digit_root(jum),
+        'word_count': wc, 'letter_count': lc,
+        'words': [{'pos': r[0], 'text': r[1], 'jummal': r[2], 'digit_root': digit_root(r[2])} for r in words_rows],
+    })
+
+
+@app.route('/api/ref/word')
+def api_ref_word():
+    """إحصاء كلمة في القرآن من مرجع التطبيق"""
+    word = request.args.get('word', '').strip()
+    if not word:
+        return jsonify({'error': 'word parameter required'}), 400
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT word_text, jummal, COUNT(*) as cnt "
+        "FROM ref_words WHERE word_text=? GROUP BY word_text, jummal",
+        (word,)
+    ).fetchall()
+    if not rows:
+        rows = conn.execute(
+            "SELECT word_text, jummal, COUNT(*) as cnt "
+            "FROM ref_words WHERE word_text LIKE ? GROUP BY word_text, jummal "
+            "ORDER BY cnt DESC LIMIT 20",
+            (f"%{word}%",)
+        ).fetchall()
+    conn.close()
+    total = sum(r[2] for r in rows)
+    return jsonify({
+        'query': word, 'total': total,
+        'forms': [{'word': r[0], 'jummal': r[1], 'digit_root': digit_root(r[1]), 'count': r[2]} for r in rows],
+    })
+
+
 if __name__ == '__main__':
     print(f"d369 API — بورت {DASHBOARD_PORT}")
     app.run(host='0.0.0.0', port=DASHBOARD_PORT, debug=False)

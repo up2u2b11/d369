@@ -789,3 +789,142 @@ def engine_compare(sid_a: int, sid_b: int) -> str:
             lines.append(f"    • {note}")
 
     return "\n".join(lines)
+
+
+# ─── المحرك السادس: البحث في المرجع ─────────────────────────────────────────
+
+def engine_ref(query: str) -> str:
+    """
+    /ref — يبحث في بيانات مرجع التطبيق (ref_ayat + ref_words)
+    أمثلة:
+      /ref 786          ← آيات جُمَّلها 786
+      /ref س:2 آ:255    ← جُمَّل آية الكرسي من المرجع
+      /ref كلمة: الله  ← إحصاء كلمة من المرجع
+    """
+    conn = get_db()
+
+    has_ref = conn.execute(
+        "SELECT COUNT(*) FROM sqlite_master WHERE name='ref_ayat'"
+    ).fetchone()[0]
+
+    if not has_ref:
+        conn.close()
+        return "⚠️ جداول المرجع غير موجودة"
+
+    q = query.strip()
+    lines = []
+
+    # ① البحث برقم الجُمَّل
+    if q.isdigit():
+        target = int(q)
+        rows = conn.execute(
+            "SELECT surah, aya, text_clean, jummal FROM ref_ayat "
+            "WHERE jummal=? ORDER BY surah, aya LIMIT 10",
+            (target,)
+        ).fetchall()
+        dr = digit_root(target)
+        lines.append(f"🔍 جُمَّل = {target:,}  (جذر {dr})")
+        if rows:
+            lines.append(f"  {len(rows)} آية في المرجع:")
+            for s, a, text, j in rows:
+                lines.append(f"  [{s}:{a}] {text[:40]}  ({j})")
+        else:
+            lo, hi = int(target * 0.95), int(target * 1.05)
+            near = conn.execute(
+                "SELECT surah, aya, text_clean, jummal FROM ref_ayat "
+                "WHERE jummal BETWEEN ? AND ? ORDER BY ABS(jummal-?) LIMIT 5",
+                (lo, hi, target)
+            ).fetchall()
+            if near:
+                lines.append("  لا تطابق دقيق — أقرب قيم:")
+                for s, a, text, j in near:
+                    lines.append(f"  [{s}:{a}] {text[:35]}  ({j:,}  فرق={j-target:+d})")
+            else:
+                lines.append("  لا توجد آيات قريبة في المرجع")
+
+        wrows = conn.execute(
+            "SELECT word_text, COUNT(*) as cnt FROM ref_words "
+            "WHERE jummal=? GROUP BY word_text ORDER BY cnt DESC LIMIT 8",
+            (target,)
+        ).fetchall()
+        if wrows:
+            lines.append(f"\n  كلمات جُمَّلها {target}:")
+            for w, cnt in wrows:
+                lines.append(f"    {w} ({cnt} مرة)")
+
+    # ② البحث في آية محددة: س:2 آ:255
+    elif re.search(r'س[:：]?\s*(\d+)', q) and re.search(r'آ[:：]?\s*(\d+)', q):
+        sm = re.search(r'س[:：]?\s*(\d+)', q)
+        am = re.search(r'آ[:：]?\s*(\d+)', q)
+        surah, aya = int(sm.group(1)), int(am.group(1))
+        row = conn.execute(
+            "SELECT text_clean, text_tashkeel, jummal, word_count, letter_count "
+            "FROM ref_ayat WHERE surah=? AND aya=?",
+            (surah, aya)
+        ).fetchone()
+        if row:
+            text_c, text_t, jum, wc, lc = row
+            dr = digit_root(jum)
+            d369_row = conn.execute(
+                "SELECT jummal_value FROM ayahs WHERE surah_id=? AND ayah_number=?",
+                (surah, aya)
+            ).fetchone()
+            match = "✅" if d369_row and d369_row[0] == jum else f"⚠️ d369={d369_row[0] if d369_row else '?'}"
+            lines.append(f"📖 [{surah}:{aya}]  {match}")
+            lines.append(f"  النص: {text_c}")
+            lines.append(f"  كلمات={wc} | حروف={lc}")
+            lines.append(f"  جُمَّل المرجع: {jum:,}  (جذر {dr})")
+            words = conn.execute(
+                "SELECT word_text, jummal FROM ref_words "
+                "WHERE aya_global_id=(SELECT aya_global_id FROM ref_ayat WHERE surah=? AND aya=?) "
+                "ORDER BY word_pos",
+                (surah, aya)
+            ).fetchall()
+            if words:
+                lines.append("  كلماتها:")
+                for w, wj in words:
+                    lines.append(f"    {w} = {wj}  (جذر {digit_root(wj)})")
+        else:
+            lines.append(f"⚠️ [{surah}:{aya}] غير موجودة في المرجع")
+
+    # ③ البحث بكلمة
+    elif q.startswith("كلمة") or q.startswith("كلمه") or q.startswith("word"):
+        word = re.sub(r'^(كلمة|كلمه|word)\s*[:：]?\s*', '', q).strip()
+        rows = conn.execute(
+            "SELECT word_text, jummal, COUNT(*) as cnt "
+            "FROM ref_words WHERE word_text=? GROUP BY word_text, jummal",
+            (word,)
+        ).fetchall()
+        if not rows:
+            rows = conn.execute(
+                "SELECT word_text, jummal, COUNT(*) as cnt "
+                "FROM ref_words WHERE word_text LIKE ? GROUP BY word_text, jummal "
+                "ORDER BY cnt DESC LIMIT 10",
+                (f"%{word}%",)
+            ).fetchall()
+        if rows:
+            lines.append(f"🔤 كلمة [{word}] في المرجع:")
+            total = sum(r[2] for r in rows)
+            lines.append(f"  إجمالي: {total} مرة")
+            for w, j, cnt in rows[:8]:
+                lines.append(f"  {w} | جُمَّل={j} (جذر {digit_root(j)}) | {cnt} مرة")
+        else:
+            lines.append(f"⚠️ [{word}] غير موجودة في المرجع")
+
+    # ④ إحصاء عام
+    else:
+        total_aya = conn.execute("SELECT COUNT(*) FROM ref_ayat").fetchone()[0]
+        total_words = conn.execute("SELECT COUNT(*) FROM ref_words").fetchone()[0]
+        unique_j = conn.execute("SELECT COUNT(DISTINCT jummal) FROM ref_ayat").fetchone()[0]
+        lines.append("📚 مرجع التطبيق:")
+        lines.append(f"  آيات: {total_aya:,}")
+        lines.append(f"  كلمات: {total_words:,}")
+        lines.append(f"  قيم جُمَّل فريدة: {unique_j:,}")
+        lines.append("")
+        lines.append("أمثلة:")
+        lines.append("  /ref 786       ← آيات جُمَّلها 786")
+        lines.append("  /ref س:2 آ:255 ← آية الكرسي")
+        lines.append("  /ref كلمة: الله ← إحصاء كلمة")
+
+    conn.close()
+    return "\n".join(lines)

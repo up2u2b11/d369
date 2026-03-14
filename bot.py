@@ -42,7 +42,7 @@ from d369_engine import (
     engine_match, format_match,
     engine_correlation, format_correlation,
     engine_sequence, format_sequence,
-    engine_overview, engine_compare,
+    engine_overview, engine_compare, engine_ref,
     parse_group_spec,
 )
 
@@ -538,6 +538,11 @@ async def cmd_compare(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("أدخل رقمَي سورتين (1-114)")
 
 
+async def cmd_ref(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    q = " ".join(ctx.args).strip() if ctx.args else ""
+    await _send_long(update, engine_ref(q))
+
+
 async def cmd_soul(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await _send_long(update, SOUL)
 
@@ -676,6 +681,7 @@ async def set_menu(app):
         BotCommand("correlation", "🔗 علاقة بين مجموعتين"),
         BotCommand("sequence", "📈 تحليل تسلسل المجموعة"),
         BotCommand("compare", "⚖️ مقارنة سورتين"),
+        BotCommand("ref", "📚 بحث في مرجع التطبيق"),
         BotCommand("count", "📊 عدّ كلمة في القرآن"),
         BotCommand("discover", "🧪 اكتشاف الأنماط"),
         BotCommand("s6", "⚡ الحساب الخاص-6"),
@@ -718,6 +724,7 @@ def main():
     app.add_handler(CommandHandler("correlation", cmd_correlation))
     app.add_handler(CommandHandler("sequence", cmd_sequence))
     app.add_handler(CommandHandler("compare", cmd_compare))
+    app.add_handler(CommandHandler("ref", cmd_ref))
     app.add_handler(CommandHandler("discover", cmd_discover))
     app.add_handler(CommandHandler("count", cmd_count))
     app.add_handler(CommandHandler("s6", cmd_special6))
