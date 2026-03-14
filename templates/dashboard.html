@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لله — محرك الجُمَّل القرآني</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a1a;--card:#12122a;--border:#1e1e3a;--gold:#d4a853;--green:#4ecdc4;--text:#e8e8f0;--dim:#888;--accent:#6366f1}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl}
+.header{text-align:center;padding:20px 15px 10px;background:linear-gradient(135deg,#0d0d2b,#1a1040)}
+.header h1{font-size:28px;color:var(--gold);margin-bottom:4px}
+.header .sub{color:var(--dim);font-size:13px}
+.tabs{display:flex;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--border);padding:0 5px;-webkit-overflow-scrolling:touch}
+.tabs button{flex-shrink:0;background:none;border:none;color:var(--dim);padding:12px 16px;font-size:14px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit}
+.tabs button.active{color:var(--gold);border-bottom-color:var(--gold)}
+.content{padding:12px;max-width:800px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.card h3{color:var(--gold);font-size:16px;margin-bottom:10px}
+.section{display:none}
+.section.active{display:block}
+input[type=text],input[type=number],select{width:100%;padding:10px 12px;background:#1a1a35;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:15px;font-family:inherit;direction:rtl;margin-bottom:8px}
+input:focus{outline:none;border-color:var(--gold)}
+button.btn{background:var(--gold);color:#000;border:none;padding:10px 20px;border-radius:8px;font-size:14px;cursor:pointer;font-family:inherit;width:100%}
+button.btn:active{opacity:.8}
+.result{margin-top:10px;min-height:40px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--border);text-align:right}
+th{color:var(--gold);font-size:12px}
+.num{color:var(--green);font-weight:bold;direction:ltr;text-align:center}
+.badge{display:inline-block;background:var(--accent);color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;margin:2px}
+.grid10{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;font-size:10px;direction:ltr}
+.grid10 .cell{background:#1a1a35;padding:4px 2px;text-align:center;border-radius:4px;line-height:1.3}
+.grid10 .cell .n{color:var(--gold);font-size:9px;display:block}
+.grid10 .cell .v{color:var(--green);font-size:10px;font-weight:bold}
+.diag{background:#2a1a40 !important}
+.breakdown{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.breakdown .letter-box{background:#1a1a35;padding:6px 10px;border-radius:6px;text-align:center}
+.breakdown .letter-box .ch{font-size:18px;color:var(--gold)}
+.breakdown .letter-box .val{font-size:11px;color:var(--green)}
+.stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.stat-row:last-child{border:none}
+.stat-label{color:var(--dim)}
+.stat-val{color:var(--green);font-weight:bold}
+.loading{text-align:center;color:var(--dim);padding:20px}
+.search-type{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.search-type button{background:#1a1a35;border:1px solid var(--border);color:var(--dim);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit}
+.search-type button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.axis-card{background:#1a1a35;border-radius:8px;padding:10px;margin-bottom:8px}
+.axis-letter{font-size:28px;color:var(--gold);float:left;margin-right:10px;margin-left:0;width:40px;text-align:center}
+.axis-detail{font-size:12px;line-height:1.8}
+.axis-detail span{color:var(--dim)}
+.pair{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid #1a1a35}
+.pair:last-child{border:none}
+.scroll-hint{text-align:center;color:var(--dim);font-size:11px;margin-top:4px}
+@media(max-width:400px){.grid10{font-size:8px}.grid10 .cell{padding:2px 1px}.grid10 .cell .n{font-size:7px}.grid10 .cell .v{font-size:8px}}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>لله</h1>
+<div class="sub">محرك الجُمَّل القرآني + محاور ابن عربي — 3+6+9=18→9</div>
+</div>
+
+<div class="tabs">
+<button class="active" onclick="showTab('square')">المعشّر</button>
+<button onclick="showTab('axes')">المحاور</button>
+<button onclick="showTab('jummal')">حساب الجُمَّل</button>
+<button onclick="showTab('search')">البحث</button>
+<button onclick="showTab('stats')">الإحصاء</button>
+</div>
+
+<div class="content">
+
+<!-- ═══ المعشّر السحري ═══ -->
+<div id="tab-square" class="section active">
+<div class="card">
+<h3>معشّر الأسماء الحسنى — 99 + محمد ﷺ</h3>
+<div class="stat-row"><span class="stat-label">الحجم</span><span class="stat-val">10 × 10</span></div>
+<div class="stat-row"><span class="stat-label">المجموع السحري</span><span class="stat-val">3394</span></div>
+<div class="stat-row"><span class="stat-label">3394 →</span><span class="stat-val">19 → 10 → 1 (التوحيد)</span></div>
+<div class="stat-row"><span class="stat-label">19</span><span class="stat-val">عدد حروف البسملة</span></div>
+</div>
+<div class="card">
+<h3>الشبكة</h3>
+<div id="square-grid" class="loading">جارٍ التحميل...</div>
+<div class="scroll-hint">↔ اسحب لرؤية الشبكة كاملة</div>
+</div>
+<div class="card">
+<h3>القطر الرئيسي ↘</h3>
+<div id="square-diagonal"></div>
+</div>
+</div>
+
+<!-- ═══ المحاور ═══ -->
+<div id="tab-axes" class="section">
+<div class="card">
+<h3>محاور ابن عربي — 28 حرفاً</h3>
+<div style="color:var(--dim);font-size:12px;margin-bottom:10px">كل حرف = اسم إلهي + نبي + سورة + عنصر كوني + طاقة + نجم + برج</div>
+<div id="axes-list" class="loading">جارٍ التحميل...</div>
+</div>
+</div>
+
+<!-- ═══ حساب الجُمَّل ═══ -->
+<div id="tab-jummal" class="section">
+<div class="card">
+<h3>حساب الجُمَّل</h3>
+<input type="text" id="jummal-input" placeholder="اكتب نصاً عربياً..." autofocus>
+<button class="btn" onclick="calcJummal()">احسب</button>
+<div id="jummal-result" class="result"></div>
+</div>
+<div class="card">
+<h3>بحث بقيمة الجُمَّل</h3>
+<input type="number" id="jummal-value" placeholder="أدخل رقماً...">
+<div class="search-type">
+<button class="active" onclick="setScope(this,'words')">كلمات</button>
+<button onclick="setScope(this,'ayahs')">آيات</button>
+<button onclick="setScope(this,'surahs')">سور</button>
+<button onclick="setScope(this,'names')">أسماء</button>
+</div>
+<button class="btn" onclick="searchByValue()">ابحث</button>
+<div id="value-result" class="result"></div>
+</div>
+<div class="card">
+<h3>التوافقات</h3>
+<input type="text" id="match-input" placeholder="اسم أو نص للبحث عن توافقاته...">
+<button class="btn" onclick="findMatches()">اعثر على التوافقات</button>
+<div id="match-result" class="result"></div>
+</div>
+</div>
+
+<!-- ═══ البحث ═══ -->
+<div id="tab-search" class="section">
+<div class="card">
+<h3>بحث في الأسماء الحسنى</h3>
+<input type="text" id="name-input" placeholder="اسم مثل: القاهر، الرحمن...">
+<button class="btn" onclick="searchName()">ابحث</button>
+<div id="name-result" class="result"></div>
+</div>
+<div class="card">
+<h3>بحث في السور</h3>
+<div style="display:flex;gap:8px">
+<input type="number" id="surah-id" placeholder="رقم السورة (1-114)" style="flex:1">
+<button class="btn" onclick="searchSurah()" style="width:auto;padding:10px 16px">ابحث</button>
+</div>
+<div id="surah-result" class="result"></div>
+</div>
+<div class="card">
+<h3>تفاصيل آية</h3>
+<div style="display:flex;gap:8px">
+<input type="number" id="ayah-surah" placeholder="السورة" style="flex:1">
+<input type="number" id="ayah-num" placeholder="الآية" style="flex:1">
+<button class="btn" onclick="searchAyah()" style="width:auto;padding:10px 16px">ابحث</button>
+</div>
+<div id="ayah-result" class="result"></div>
+</div>
+<div class="card">
+<h3>بحث بالجذر الرقمي</h3>
+<div style="display:flex;gap:8px;align-items:center">
+<select id="digit-root-val" style="flex:1">
+<option value="">اختر الجذر...</option>
+<option value="1">1</option><option value="2">2</option><option value="3">3</option>
+<option value="4">4</option><option value="5">5</option><option value="6">6</option>
+<option value="7">7</option><option value="8">8</option><option value="9">9</option>
+</select>
+<select id="digit-root-scope" style="flex:1">
+<option value="surahs">سور</option>
+<option value="names">أسماء</option>
+</select>
+<button class="btn" onclick="searchDigitRoot()" style="width:auto;padding:10px 16px">ابحث</button>
+</div>
+<div id="digit-root-result" class="result"></div>
+</div>
+<div class="card">
+<h3>قواسم العدد</h3>
+<input type="number" id="divisor-num" placeholder="أدخل رقماً...">
+<button class="btn" onclick="searchDivisors()">اعرض القواسم</button>
+<div id="divisor-result" class="result"></div>
+</div>
+</div>
+
+<!-- ═══ الإحصاء ═══ -->
+<div id="tab-stats" class="section">
+<div class="card">
+<h3>الإحصاء القرآني</h3>
+<div id="stats-overview" class="loading">جارٍ التحميل...</div>
+</div>
+<div class="card">
+<h3>توزيع الجذور الرقمية — 114 سورة</h3>
+<div id="stats-roots" class="loading">جارٍ التحميل...</div>
+</div>
+<div class="card">
+<h3>أكبر 10 سور (بالجُمَّل)</h3>
+<div id="stats-top" class="loading">جارٍ التحميل...</div>
+</div>
+</div>
+
+</div>
+
+<div style="text-align:center;padding:20px;color:var(--dim);font-size:11px">
+d369 — الملكية الفكرية: عماد سليمان علوان<br>
+3 + 6 + 9 = 18 → 9
+</div>
+
+<script>
+// detect base path from current URL (works behind /lellah/ proxy)
+const BASE = window.location.pathname.replace(/\/+$/, '');
+const API = BASE;
+
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+async function api(path) {
+  const r = await fetch(API + path);
+  return r.json();
+}
+
+// ═══ المعشّر ═══
+async function loadSquare() {
+  const d = await api('/api/data/square');
+  if (!d.grid) return;
+  const grid = d.grid;
+  let html = '<div class="grid10" style="overflow-x:auto">';
+  for (let r = 0; r < 10; r++) {
+    for (let c = 0; c < 10; c++) {
+      const cell = grid[r][c];
+      const isDiag = (r === c) ? ' diag' : '';
+      html += `<div class="cell${isDiag}"><span class="n">${cell.name}</span><span class="v">${cell.value}</span></div>`;
+    }
+  }
+  html += '</div>';
+  document.getElementById('square-grid').innerHTML = html;
+
+  // diagonal
+  let diagHtml = '';
+  for (let i = 0; i < 10; i++) {
+    const cell = grid[i][i];
+    diagHtml += `<div class="pair"><span>${cell.name}</span><span class="num">${cell.value}</span></div>`;
+  }
+  const diagSum = grid.map((r,i) => r[i].value).reduce((a,b) => a+b, 0);
+  diagHtml += `<div class="pair" style="border-top:2px solid var(--gold);margin-top:4px;padding-top:8px"><span style="color:var(--gold)">المجموع</span><span class="num" style="font-size:16px">${diagSum}</span></div>`;
+  document.getElementById('square-diagonal').innerHTML = diagHtml;
+}
+
+// ═══ المحاور ═══
+async function loadAxes() {
+  const d = await api('/api/data/axes');
+  if (!d.axes) return;
+  let html = '';
+  d.axes.forEach(a => {
+    html += `<div class="axis-card">
+      <div class="axis-letter">${a.letter}</div>
+      <div class="axis-detail">
+        <strong>${a.divine_name}</strong> (جُمَّل=${a.divine_name_jummal})<br>
+        <span>النبي:</span> ${a.prophet}<br>
+        <span>السورة:</span> ${a.surah || '—'}<br>
+        <span>العنصر:</span> ${a.cosmic_element || '—'}<br>
+        <span>الطاقة:</span> ${a.spiritual_energy || '—'}<br>
+        <span>المنزل:</span> ${a.lunar_mansion || '—'} | <span>البرج:</span> ${a.zodiac_sign || '—'}
+      </div>
+      <div style="clear:both"></div>
+    </div>`;
+  });
+  document.getElementById('axes-list').innerHTML = html;
+}
+
+// ═══ حساب الجُمَّل ═══
+let searchScope = 'words';
+function setScope(btn, scope) {
+  searchScope = scope;
+  btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+async function calcJummal() {
+  const text = document.getElementById('jummal-input').value.trim();
+  if (!text) return;
+  const d = await api('/api/jummal?text=' + encodeURIComponent(text));
+  let html = `<div class="stat-row"><span class="stat-label">الجُمَّل التقليدي</span><span class="stat-val">${d.traditional}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">الخاص-6</span><span class="stat-val">${d.special_6}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">الجذر الرقمي</span><span class="stat-val">${d.digit_root}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">عدد الحروف</span><span class="stat-val">${d.letter_count}</span></div>`;
+  if (d.breakdown && d.breakdown.length) {
+    html += '<div class="breakdown">';
+    d.breakdown.forEach(b => {
+      html += `<div class="letter-box"><div class="ch">${b.letter}</div><div class="val">${b.traditional}</div></div>`;
+    });
+    html += '</div>';
+  }
+  document.getElementById('jummal-result').innerHTML = html;
+}
+
+async function searchByValue() {
+  const val = document.getElementById('jummal-value').value;
+  if (!val) return;
+  const el = document.getElementById('value-result');
+  el.innerHTML = '<div class="loading">جارٍ البحث...</div>';
+  const d = await api(`/api/data/search_value?value=${val}&scope=${searchScope}`);
+  if (!d.results || !d.results.length) { el.innerHTML = '<div style="color:var(--dim)">لا توجد نتائج</div>'; return; }
+  let html = `<div style="color:var(--dim);font-size:12px;margin-bottom:6px">${d.results.length} نتيجة</div><table><tr>`;
+  if (searchScope === 'words') html += '<th>الكلمة</th><th>السورة:الآية</th><th>الجُمَّل</th></tr>';
+  else if (searchScope === 'ayahs') html += '<th>السورة:الآية</th><th>الجُمَّل</th><th>الجذر</th></tr>';
+  else if (searchScope === 'surahs') html += '<th>السورة</th><th>الجُمَّل</th><th>الجذر</th></tr>';
+  else html += '<th>الاسم</th><th>الجُمَّل</th><th>الجذر</th></tr>';
+  d.results.slice(0, 50).forEach(r => {
+    html += '<tr>';
+    if (searchScope === 'words') html += `<td>${r.text}</td><td class="num">${r.surah}:${r.ayah}</td><td class="num">${r.jummal}</td>`;
+    else if (searchScope === 'ayahs') html += `<td>${r.surah_name} ${r.surah}:${r.ayah}</td><td class="num">${r.jummal}</td><td class="num">${r.digit_root}</td>`;
+    else if (searchScope === 'surahs') html += `<td>${r.name}</td><td class="num">${r.jummal}</td><td class="num">${r.digit_root}</td>`;
+    else html += `<td>${r.name}</td><td class="num">${r.jummal}</td><td class="num">${r.digit_root}</td>`;
+    html += '</tr>';
+  });
+  html += '</table>';
+  el.innerHTML = html;
+}
+
+async function findMatches() {
+  const text = document.getElementById('match-input').value.trim();
+  if (!text) return;
+  const el = document.getElementById('match-result');
+  el.innerHTML = '<div class="loading">جارٍ البحث...</div>';
+  const d = await api('/api/match?text=' + encodeURIComponent(text));
+  let html = '';
+  if (d.jummal) html += `<div class="stat-row"><span class="stat-label">الجُمَّل</span><span class="stat-val">${d.jummal}</span></div>`;
+  if (d.digit_root) html += `<div class="stat-row"><span class="stat-label">الجذر</span><span class="stat-val">${d.digit_root}</span></div>`;
+  if (d.matching_names && d.matching_names.length) {
+    html += '<h3 style="margin-top:10px;font-size:14px;color:var(--gold)">أسماء بنفس الجُمَّل</h3>';
+    d.matching_names.forEach(n => { html += `<div class="pair"><span>${n.name || n}</span><span class="num">${n.jummal || ''}</span></div>`; });
+  }
+  if (d.matching_words && d.matching_words.length) {
+    html += `<h3 style="margin-top:10px;font-size:14px;color:var(--gold)">كلمات قرآنية بنفس الجُمَّل (${d.matching_words.length})</h3>`;
+    d.matching_words.slice(0, 20).forEach(w => { html += `<div class="pair"><span>${w.text || w} ${w.ref || ''}</span><span class="num">${w.jummal || ''}</span></div>`; });
+  }
+  el.innerHTML = html || '<div style="color:var(--dim)">لا توجد توافقات</div>';
+}
+
+// ═══ البحث ═══
+async function searchName() {
+  const name = document.getElementById('name-input').value.trim();
+  if (!name) return;
+  const el = document.getElementById('name-result');
+  el.innerHTML = '<div class="loading">جارٍ البحث...</div>';
+  const d = await api('/api/data/name?name=' + encodeURIComponent(name));
+  if (!d.found) { el.innerHTML = '<div style="color:var(--dim)">لم يُعثر على الاسم</div>'; return; }
+  const n = d.data;
+  let html = `<div class="stat-row"><span class="stat-label">الاسم</span><span class="stat-val">${n.arabic}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">الجُمَّل</span><span class="stat-val">${n.jummal_value}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">الجذر الرقمي</span><span class="stat-val">${n.digit_root}</span></div>`;
+  if (n.meaning_ar) html += `<div class="stat-row"><span class="stat-label">المعنى</span><span class="stat-val">${n.meaning_ar}</span></div>`;
+  if (n.square_row != null) html += `<div class="stat-row"><span class="stat-label">المعشّر</span><span class="stat-val">صف ${n.square_row+1} عمود ${n.square_col+1}</span></div>`;
+  el.innerHTML = html;
+}
+
+async function searchSurah() {
+  const id = document.getElementById('surah-id').value;
+  if (!id) return;
+  const el = document.getElementById('surah-result');
+  el.innerHTML = '<div class="loading">جارٍ البحث...</div>';
+  const d = await api('/api/data/surah?id=' + id);
+  if (!d.found) { el.innerHTML = '<div style="color:var(--dim)">لم تُعثر السورة</div>'; return; }
+  const s = d.data;
+  let html = `<div class="stat-row"><span class="stat-label">السورة</span><span class="stat-val">${s.name_ar} (${s.surah_id})</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">عدد الآيات</span><span class="stat-val">${s.ayah_count}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">عدد الكلمات</span><span class="stat-val">${s.word_count}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">عدد الحروف</span><span class="stat-val">${s.letter_count}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">جُمَّل السورة</span><span class="stat-val">${(s.jummal_total||0).toLocaleString()}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">الجذر الرقمي</span><span class="stat-val">${s.digit_root}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">النزول</span><span class="stat-val">${s.revelation_type === 'meccan' ? 'مكية' : 'مدنية'} (ترتيب ${s.revelation_order || '—'})</span></div>`;
+  if (s.name_jummal) html += `<div class="stat-row"><span class="stat-label">جُمَّل الاسم</span><span class="stat-val">${s.name_jummal}</span></div>`;
+  el.innerHTML = html;
+}
+
+async function searchAyah() {
+  const surah = document.getElementById('ayah-surah').value;
+  const ayah = document.getElementById('ayah-num').value;
+  if (!surah || !ayah) return;
+  const el = document.getElementById('ayah-result');
+  el.innerHTML = '<div class="loading">جارٍ البحث...</div>';
+  const d = await api(`/api/ayah?surah=${surah}&ayah=${ayah}`);
+  if (d.error) { el.innerHTML = '<div style="color:var(--dim)">' + d.error + '</div>'; return; }
+  let html = `<div style="font-size:16px;line-height:2;margin-bottom:10px;color:var(--gold)">${d.text || d.text_clean || ''}</div>`;
+  if (d.jummal_value != null) html += `<div class="stat-row"><span class="stat-label">الجُمَّل</span><span class="stat-val">${d.jummal_value}</span></div>`;
+  if (d.digit_root != null) html += `<div class="stat-row"><span class="stat-label">الجذر الرقمي</span><span class="stat-val">${d.digit_root}</span></div>`;
+  if (d.word_count != null) html += `<div class="stat-row"><span class="stat-label">الكلمات</span><span class="stat-val">${d.word_count}</span></div>`;
+  if (d.letter_count != null) html += `<div class="stat-row"><span class="stat-label">الحروف</span><span class="stat-val">${d.letter_count}</span></div>`;
+  if (d.words && d.words.length) {
+    html += '<div class="breakdown">';
+    d.words.forEach(w => {
+      html += `<div class="letter-box"><div class="ch">${w.text || w.text_clean}</div><div class="val">${w.jummal_value || w.jummal || ''}</div></div>`;
+    });
+    html += '</div>';
+  }
+  el.innerHTML = html;
+}
+
+async function searchDigitRoot() {
+  const root = document.getElementById('digit-root-val').value;
+  const scope = document.getElementById('digit-root-scope').value;
+  if (!root) return;
+  const el = document.getElementById('digit-root-result');
+  el.innerHTML = '<div class="loading">جارٍ البحث...</div>';
+  const d = await api(`/api/data/digit_root?root=${root}&scope=${scope}`);
+  if (!d.results || !d.results.length) { el.innerHTML = '<div style="color:var(--dim)">لا توجد نتائج</div>'; return; }
+  let html = `<div style="color:var(--dim);font-size:12px;margin-bottom:6px">${d.results.length} نتيجة — جذر ${root}</div><table>`;
+  if (scope === 'surahs') {
+    html += '<tr><th>#</th><th>السورة</th><th>الجُمَّل</th><th>الجذر</th></tr>';
+    d.results.forEach(r => { html += `<tr><td class="num">${r.id}</td><td>${r.name}</td><td class="num">${(r.jummal||0).toLocaleString()}</td><td class="num">${r.digit_root}</td></tr>`; });
+  } else {
+    html += '<tr><th>الاسم</th><th>الجُمَّل</th><th>الجذر</th></tr>';
+    d.results.forEach(r => { html += `<tr><td>${r.name}</td><td class="num">${r.jummal}</td><td class="num">${r.digit_root}</td></tr>`; });
+  }
+  html += '</table>';
+  el.innerHTML = html;
+}
+
+async function searchDivisors() {
+  const num = document.getElementById('divisor-num').value;
+  if (!num) return;
+  const el = document.getElementById('divisor-result');
+  el.innerHTML = '<div class="loading">جارٍ الحساب...</div>';
+  const d = await api('/api/divisors?number=' + num);
+  if (d.error) { el.innerHTML = d.error; return; }
+  let html = `<div class="stat-row"><span class="stat-label">العدد</span><span class="stat-val">${d.number || num}</span></div>`;
+  if (d.digit_root != null) html += `<div class="stat-row"><span class="stat-label">الجذر الرقمي</span><span class="stat-val">${d.digit_root}</span></div>`;
+  if (d.divisor_count != null) html += `<div class="stat-row"><span class="stat-label">عدد القواسم</span><span class="stat-val">${d.divisor_count}</span></div>`;
+  if (d.divisors && d.divisors.length) {
+    html += '<div class="breakdown">';
+    d.divisors.forEach(div => {
+      const v = typeof div === 'object' ? div.value : div;
+      const dr = typeof div === 'object' ? div.digit_root : '';
+      html += `<div class="letter-box"><div class="ch">${v}</div><div class="val">جذر ${dr}</div></div>`;
+    });
+    html += '</div>';
+  }
+  if (d.matching_names && d.matching_names.length) {
+    html += '<h3 style="margin-top:10px;font-size:14px;color:var(--gold)">أسماء بنفس القيمة</h3>';
+    d.matching_names.forEach(n => { html += `<div class="pair"><span>${n.name || n}</span><span class="num">${n.jummal || ''}</span></div>`; });
+  }
+  el.innerHTML = html;
+}
+
+// ═══ الإحصاء ═══
+async function loadStats() {
+  const d = await api('/api/data/stats');
+  let html = '';
+  html += `<div class="stat-row"><span class="stat-label">عدد السور</span><span class="stat-val">${d.surahs || 114}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">عدد الآيات</span><span class="stat-val">${(d.ayahs || 6236).toLocaleString()}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">عدد الكلمات</span><span class="stat-val">${(d.words || 78248).toLocaleString()}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">مجموع جُمَّل القرآن</span><span class="stat-val">${(d.total_jummal || 0).toLocaleString()}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">الجذر الرقمي</span><span class="stat-val">${d.total_digit_root || ''}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">الأسماء الحسنى</span><span class="stat-val">${d.names || 100}</span></div>`;
+  html += `<div class="stat-row"><span class="stat-label">محاور ابن عربي</span><span class="stat-val">${d.axes || 28}</span></div>`;
+  document.getElementById('stats-overview').innerHTML = html;
+
+  // digit roots
+  if (d.digit_root_distribution) {
+    let rhtml = '<table><tr><th>الجذر</th><th>عدد السور</th><th>النسبة</th></tr>';
+    d.digit_root_distribution.forEach(r => {
+      const pct = ((r.count / 114) * 100).toFixed(1);
+      rhtml += `<tr><td class="num">${r.root}</td><td class="num">${r.count}</td><td class="num">${pct}%</td></tr>`;
+    });
+    rhtml += '</table>';
+    document.getElementById('stats-roots').innerHTML = rhtml;
+  }
+
+  // top surahs
+  if (d.top_surahs) {
+    let thtml = '<table><tr><th>#</th><th>السورة</th><th>الجُمَّل</th><th>الجذر</th></tr>';
+    d.top_surahs.forEach(s => {
+      thtml += `<tr><td class="num">${s.id}</td><td>${s.name}</td><td class="num">${(s.jummal||0).toLocaleString()}</td><td class="num">${s.digit_root}</td></tr>`;
+    });
+    thtml += '</table>';
+    document.getElementById('stats-top').innerHTML = thtml;
+  }
+}
+
+// Enter key handlers
+document.addEventListener('DOMContentLoaded', () => {
+  loadSquare();
+  loadAxes();
+  loadStats();
+  document.getElementById('jummal-input').addEventListener('keydown', e => { if (e.key === 'Enter') calcJummal(); });
+  document.getElementById('jummal-value').addEventListener('keydown', e => { if (e.key === 'Enter') searchByValue(); });
+  document.getElementById('match-input').addEventListener('keydown', e => { if (e.key === 'Enter') findMatches(); });
+  document.getElementById('name-input').addEventListener('keydown', e => { if (e.key === 'Enter') searchName(); });
+  document.getElementById('divisor-num').addEventListener('keydown', e => { if (e.key === 'Enter') searchDivisors(); });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+[Unit]
+Description=d369 API — محرك الجُمَّل
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/d369
+ExecStart=/usr/bin/python3 /root/d369/api.py
+Restart=always
+RestartSec=10
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
