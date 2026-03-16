@@ -45,6 +45,14 @@ from d369_engine import (
     engine_overview, engine_compare, engine_ref,
     parse_group_spec,
 )
+from calc_engine import calc_all, list_systems, get_ayah_calcs
+from observer import run_observer, get_latest_discoveries
+from card_engine import (
+    init_cards_db, open_session, get_open_session, add_card,
+    verify_card, list_cards, get_card, stats as card_stats,
+    quick_probe, format_card,
+)
+init_cards_db()
 
 # ─── الروح ───
 SOUL_PATH = Path(__file__).parent / "d369_soul.md"
@@ -543,6 +551,94 @@ async def cmd_ref(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await _send_long(update, engine_ref(q))
 
 
+async def cmd_calc(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """حساب نص بكل الأنظمة — /calc بسم الله"""
+    text = " ".join(ctx.args).strip() if ctx.args else ""
+    if not text:
+        await update.message.reply_text("⚠️ مثال: /calc بسم الله الرحمن الرحيم")
+        return
+    results = calc_all(text)
+    lines = [f"🔢 حساب: *{text}*\n"]
+    labels = {
+        'kabir':       '📊 الجُمَّل الكبير',
+        'saghir':      '🔹 الجُمَّل الصغير',
+        'ordinal':     '🔢 الترتيب الأبجدي',
+        'lettercount': '🔤 عدد الحروف',
+        'special6':    '⚡ الخاص-6',
+    }
+    for name, data in results.items():
+        label = labels.get(name, name)
+        lines.append(f"{label}: `{data['value']}` (ج={data['digit_root']})")
+    await _send_long(update, "\n".join(lines))
+
+
+async def cmd_systems(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """عرض الأنظمة المتاحة — /systems"""
+    systems = list_systems()
+    if not systems:
+        await update.message.reply_text("⚠️ الأنظمة غير موجودة — شغّل upgrade_v3.py أولاً")
+        return
+    lines = ["🗂 *أنظمة الحساب المتاحة:*\n"]
+    for s in systems:
+        status = "✅" if s['active'] else "⭕"
+        builtin = "مدمج" if s.get('id', 0) <= 5 else "مخصص"
+        lines.append(f"{status} [{s['id']}] *{s['name_ar']}* ({s['name']}) — {builtin}")
+        if s['desc']:
+            lines.append(f"    _{s['desc']}_")
+    await _send_long(update, "\n".join(lines))
+
+
+async def cmd_ayahcalc(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """حساب آية بكل الأنظمة — /ayahcalc 1:1 أو /ayahcalc سورة آية"""
+    args = ctx.args if ctx.args else []
+    surah, aya = None, None
+    if len(args) == 1 and ':' in args[0]:
+        parts = args[0].split(':')
+        surah, aya = int(parts[0]), int(parts[1])
+    elif len(args) == 2:
+        surah, aya = int(args[0]), int(args[1])
+    if not surah or not aya:
+        await update.message.reply_text("⚠️ مثال: /ayahcalc 1:1 أو /ayahcalc 1 7")
+        return
+    calcs = get_ayah_calcs(surah, aya)
+    if not calcs:
+        # حساب مباشر إذا لم توجد القيم المحفوظة
+        from calc_engine import calc_ayah_from_db
+        result = calc_ayah_from_db(surah, aya)
+        if 'error' in result:
+            await update.message.reply_text(f"⚠️ {result['error']}")
+            return
+        lines = [f"📖 سورة {surah} — آية {aya}\n_{result.get('text', ''[:60])}_\n"]
+        for name, data in result.items():
+            if isinstance(data, dict) and 'value' in data:
+                lines.append(f"• {name}: `{data['value']}` (ج={data['digit_root']})")
+    else:
+        lines = [f"📖 سورة {surah} — آية {aya}\n"]
+        for c in calcs:
+            lines.append(f"• *{c['name_ar']}*: `{c['value']}` (ج={c['dr']})")
+    await _send_long(update, "\n".join(lines))
+
+
+async def cmd_observe(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """تشغيل المراقب وعرض آخر الاكتشافات — /observe [quick|full]"""
+    mode = ctx.args[0] if ctx.args else 'quick'
+    if mode not in ('quick', 'full'):
+        mode = 'quick'
+    await update.message.reply_text(f"🔬 المراقب يعمل ({mode})... قد يستغرق دقيقة")
+    try:
+        total = run_observer(mode=mode, limit_each=10)
+        discoveries = get_latest_discoveries(limit=8)
+        lines = [f"✅ المراقب أنهى — {total} اكتشاف جديد\n"]
+        for d in discoveries:
+            cat = d.get('category', '')
+            claim = d.get('claim', '')
+            conf = d.get('confidence', 0)
+            lines.append(f"• [{cat[:15]}] {claim} ({conf:.0%})")
+        await _send_long(update, "\n".join(lines))
+    except Exception as e:
+        await update.message.reply_text(f"⚠️ خطأ: {e}")
+
+
 async def cmd_soul(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await _send_long(update, SOUL)
 
@@ -556,6 +652,138 @@ def table_exists(conn, name):
 async def cmd_discoveries(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     result = monitor.get_discoveries_summary()
     await _send_long(update, result)
+
+
+# ═══════════════════════════════════════════════════════
+#  نظام البطاقات المنهجية
+# ═══════════════════════════════════════════════════════
+
+async def cmd_cards(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """
+    /cards           — إحصاء + آخر 5 بطاقات
+    /cards ثوابت     — بطاقات المرحلة
+    /cards #3        — بطاقة معيّنة
+    """
+    args = " ".join(ctx.args).strip() if ctx.args else ""
+
+    if args.startswith("#"):
+        try:
+            cid = int(args[1:])
+            c = get_card(cid)
+            if not c:
+                await update.message.reply_text(f"⚠️ لا توجد بطاقة #{cid}")
+                return
+            if c.get('evidence'):
+                import json
+                try: c['evidence'] = json.loads(c['evidence'])
+                except Exception: pass
+            await update.message.reply_text(format_card(c))
+            return
+        except ValueError:
+            pass
+
+    phase_map = {"ثوابت":"constants","أنماط":"patterns","استثناءات":"exceptions"}
+    phase = phase_map.get(args) if args in phase_map else None
+
+    s = card_stats()
+    cards = list_cards(phase=phase, limit=5)
+
+    lines = [
+        "📇 البطاقات المنهجية",
+        f"  الإجمالي : {s['total_cards']} بطاقة",
+        f"  محقَّق   : {s['verified']} | متبقٍ لـ100: {s['to_100']}",
+        f"  ثوابت: {s['by_phase'].get('constants',0)} | أنماط: {s['by_phase'].get('patterns',0)} | استثناءات: {s['by_phase'].get('exceptions',0)}",
+        "",
+    ]
+    if cards:
+        title = f"آخر بطاقات {args}" if args else "آخر البطاقات"
+        lines.append(f"── {title} ──")
+        for c in cards:
+            dr_str = f"جذر={c['digit_root']}" if c.get('digit_root') else ""
+            v = {"verified":"✅","rejected":"❌","pending":"⏳"}.get(c.get('verified',''),'⏳')
+            lines.append(f"  #{c['card_id']} {v} [{c.get('number','')}→{dr_str}]")
+            lines.append(f"     {c.get('result','')[:55]}")
+
+    await _send_long(update, "\n".join(lines))
+
+
+async def cmd_session(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """
+    /session                   — الجلسة الحالية
+    /session هل X يساوي Y؟     — افتح جلسة بسؤال
+    /session close             — أغلق الجلسة بدون بطاقة
+    """
+    args = " ".join(ctx.args).strip() if ctx.args else ""
+
+    if not args:
+        s = get_open_session()
+        if not s:
+            await update.message.reply_text(
+                "لا توجد جلسة مفتوحة.\n"
+                "افتح واحدة: /session سؤالك هنا"
+            )
+        else:
+            await update.message.reply_text(
+                f"📖 جلسة مفتوحة:\n"
+                f"  ID: {s['session_id']}\n"
+                f"  السؤال: {s['question']}\n"
+                f"  فُتحت: {s['opened_at']}\n\n"
+                f"قانون التوقف: اكتشاف واحد — ثم أغلق."
+            )
+        return
+
+    if args.lower() == "close":
+        s = get_open_session()
+        if not s:
+            await update.message.reply_text("لا توجد جلسة مفتوحة.")
+        else:
+            from card_engine import close_session
+            close_session(s['session_id'])
+            await update.message.reply_text(f"✅ جلسة {s['session_id']} أُغلقت.")
+        return
+
+    # افتح جلسة جديدة
+    current = get_open_session()
+    if current:
+        await update.message.reply_text(
+            f"⚠️ جلسة مفتوحة بالفعل:\n{current['question']}\n\n"
+            f"أغلقها أولاً: /session close"
+        )
+        return
+
+    sid = open_session(args)
+    await update.message.reply_text(
+        f"✅ جلسة جديدة: {sid}\n"
+        f"السؤال: {args}\n\n"
+        f"الآن d369 يبحث — النتيجة في جملة واحدة.\n"
+        f"ثم: /probe [النص] للحساب الفوري."
+    )
+
+
+async def cmd_probe(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """
+    /probe نص — احسب جُمَّله واعرض الآيات المشابهة
+    /probe لا إله إلا
+    """
+    if not ctx.args:
+        await update.message.reply_text("⚠️ مثال: /probe لا إله إلا")
+        return
+    text = " ".join(ctx.args)
+    r = quick_probe(text)
+
+    lines = [
+        f"🔍 /probe: {text}",
+        f"  الجُمَّل : {r['jummal']}",
+        f"  الجذر   : {r['digit_root']}",
+        f"  تطابق مباشر: {r['exact_matches']} آية",
+        f"  نفس الجذر : {r['same_root_ayahs']} آية",
+    ]
+    if r.get('sample_exact'):
+        lines.append("  عيّنة مطابقة:")
+        for a in r['sample_exact'][:2]:
+            lines.append(f"    {a.get('surah_id','')}/{a.get('ayah_number','')} — {str(a.get('text_clean',''))[:40]}")
+
+    await update.message.reply_text("\n".join(lines))
 
 
 async def cmd_growth(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -682,6 +910,10 @@ async def set_menu(app):
         BotCommand("sequence", "📈 تحليل تسلسل المجموعة"),
         BotCommand("compare", "⚖️ مقارنة سورتين"),
         BotCommand("ref", "📚 بحث في مرجع التطبيق"),
+        BotCommand("calc", "🧮 حساب نص بكل الأنظمة"),
+        BotCommand("systems", "🗂 قائمة أنظمة الحساب"),
+        BotCommand("ayahcalc", "📖 آية بكل الأنظمة"),
+        BotCommand("observe", "🔬 تشغيل المراقب"),
         BotCommand("count", "📊 عدّ كلمة في القرآن"),
         BotCommand("discover", "🧪 اكتشاف الأنماط"),
         BotCommand("s6", "⚡ الحساب الخاص-6"),
@@ -725,6 +957,10 @@ def main():
     app.add_handler(CommandHandler("sequence", cmd_sequence))
     app.add_handler(CommandHandler("compare", cmd_compare))
     app.add_handler(CommandHandler("ref", cmd_ref))
+    app.add_handler(CommandHandler("calc", cmd_calc))
+    app.add_handler(CommandHandler("systems", cmd_systems))
+    app.add_handler(CommandHandler("ayahcalc", cmd_ayahcalc))
+    app.add_handler(CommandHandler("observe", cmd_observe))
     app.add_handler(CommandHandler("discover", cmd_discover))
     app.add_handler(CommandHandler("count", cmd_count))
     app.add_handler(CommandHandler("s6", cmd_special6))
@@ -732,6 +968,9 @@ def main():
     app.add_handler(CommandHandler("status", cmd_status))
     app.add_handler(CommandHandler("discoveries", cmd_discoveries))
     app.add_handler(CommandHandler("growth", cmd_growth))
+    app.add_handler(CommandHandler("cards", cmd_cards))
+    app.add_handler(CommandHandler("session", cmd_session))
+    app.add_handler(CommandHandler("probe", cmd_probe))
 
     # الرسائل الحرة
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))

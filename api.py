@@ -19,6 +19,12 @@ from quran_engine.search import (
     get_ayah_detail, search_by_digit_root, find_matches, discover_patterns,
 )
 import eyes
+from card_engine import (
+    init_cards_db, open_session, close_session, get_open_session,
+    add_card, verify_card, list_cards, get_card, stats as card_stats,
+    quick_probe, format_card,
+)
+init_cards_db()
 
 app = Flask(__name__)
 
@@ -392,6 +398,247 @@ def api_ref_word():
         'query': word, 'total': total,
         'forms': [{'word': r[0], 'jummal': r[1], 'digit_root': digit_root(r[1]), 'count': r[2]} for r in rows],
     })
+
+
+@app.route('/api/calc')
+def api_calc():
+    """حساب نص بكل الأنظمة الخمسة"""
+    text = request.args.get('text', '').strip()
+    if not text:
+        return jsonify({'error': 'text required'}), 400
+    from calc_engine import calc_all
+    results = calc_all(text)
+    return jsonify({'text': text, 'systems': results})
+
+
+@app.route('/api/calc/ayah')
+def api_calc_ayah():
+    """قيم آية في كل الأنظمة من ayah_calcs"""
+    surah = request.args.get('surah', type=int)
+    aya   = request.args.get('aya', type=int)
+    if not surah or not aya:
+        return jsonify({'error': 'surah and aya required'}), 400
+    conn = get_db()
+    # النص من ref_ayat
+    row = conn.execute(
+        'SELECT text_clean, text_tashkeel FROM ref_ayat WHERE surah=? AND aya=?',
+        (surah, aya)
+    ).fetchone()
+    text_clean = row['text_clean'] if row else ''
+    text_tashkeel = row['text_tashkeel'] if row else ''
+    # القيم المحسوبة
+    rows = conn.execute("""
+        SELECT cs.system_id, cs.name, cs.name_ar, ac.value, ac.digit_root
+        FROM ayah_calcs ac JOIN calc_systems cs ON ac.system_id=cs.system_id
+        WHERE ac.surah=? AND ac.aya=? AND ac.system_id<=5
+        ORDER BY ac.system_id
+    """, (surah, aya)).fetchall()
+    conn.close()
+    systems = [{'id': r['system_id'], 'name': r['name'], 'name_ar': r['name_ar'],
+                'value': r['value'], 'dr': r['digit_root']} for r in rows]
+    return jsonify({'surah': surah, 'aya': aya,
+                    'text': text_clean, 'text_tashkeel': text_tashkeel,
+                    'systems': systems})
+
+
+@app.route('/api/calc/search')
+def api_calc_search():
+    """بحث بقيمة أو جذر في نظام محدد أو في كل الأنظمة"""
+    value = request.args.get('value', type=int)
+    dr    = request.args.get('dr', type=int)
+    system_id = request.args.get('system', type=int, default=0)  # 0 = كل الأنظمة
+    min_systems = request.args.get('min_systems', type=int, default=1)
+    limit = request.args.get('limit', 30, type=int)
+    if value is None and dr is None:
+        return jsonify({'error': 'value or dr required'}), 400
+    conn = get_db()
+    if value is not None:
+        if system_id:
+            rows = conn.execute("""
+                SELECT surah, aya, value, digit_root, COUNT(*) OVER (PARTITION BY surah,aya) as c
+                FROM ayah_calcs WHERE system_id=? AND value=?
+                ORDER BY surah, aya LIMIT ?
+            """, (system_id, value, limit)).fetchall()
+        else:
+            rows = conn.execute("""
+                SELECT surah, aya, COUNT(DISTINCT system_id) as cnt, MIN(value) as value
+                FROM ayah_calcs WHERE value=? AND system_id<=5
+                GROUP BY surah, aya HAVING cnt>=?
+                ORDER BY cnt DESC, surah, aya LIMIT ?
+            """, (value, min_systems, limit)).fetchall()
+    else:
+        if system_id:
+            rows = conn.execute("""
+                SELECT surah, aya, value, digit_root
+                FROM ayah_calcs WHERE system_id=? AND digit_root=?
+                ORDER BY surah, aya LIMIT ?
+            """, (system_id, dr, limit)).fetchall()
+        else:
+            rows = conn.execute("""
+                SELECT surah, aya, COUNT(DISTINCT system_id) as cnt
+                FROM ayah_calcs WHERE digit_root=? AND system_id<=5
+                GROUP BY surah, aya HAVING cnt>=?
+                ORDER BY cnt DESC, surah, aya LIMIT ?
+            """, (dr, min_systems, limit)).fetchall()
+    conn.close()
+    return jsonify({'results': [dict(r) for r in rows],
+                    'query': {'value': value, 'dr': dr, 'system': system_id,
+                              'min_systems': min_systems}})
+
+
+@app.route('/api/calc/discoveries')
+def api_calc_discoveries():
+    """آخر الاكتشافات من المراقب"""
+    category = request.args.get('category', '')
+    limit = request.args.get('limit', 20, type=int)
+    conn = get_db()
+    if category:
+        rows = conn.execute("""
+            SELECT category, claim, evidence, confidence, created_at
+            FROM discoveries WHERE status='auto' AND category=?
+            ORDER BY created_at DESC LIMIT ?
+        """, (category, limit)).fetchall()
+    else:
+        rows = conn.execute("""
+            SELECT category, claim, evidence, confidence, created_at
+            FROM discoveries WHERE status='auto'
+            ORDER BY created_at DESC LIMIT ?
+        """, (limit,)).fetchall()
+    conn.close()
+    results = []
+    for r in rows:
+        d = dict(r)
+        try:
+            d['evidence'] = json.loads(d['evidence'])
+        except Exception:
+            pass
+        results.append(d)
+    return jsonify({'discoveries': results})
+
+
+@app.route('/api/calc/systems')
+def api_calc_systems():
+    """قائمة أنظمة الحساب"""
+    conn = get_db()
+    rows = conn.execute(
+        'SELECT system_id, name, name_ar, description, is_active FROM calc_systems ORDER BY system_id'
+    ).fetchall()
+    conn.close()
+    return jsonify({'systems': [dict(r) for r in rows]})
+
+
+# ═══════════════════════════════════════════════════════
+#  نظام البطاقات — المنهجية المُنظَّمة
+# ═══════════════════════════════════════════════════════
+
+@app.route('/api/cards/stats')
+def api_cards_stats():
+    """إحصاء البطاقات — كم أنجزنا نحو 100 ونحو 1000"""
+    return jsonify(card_stats())
+
+
+@app.route('/api/cards', methods=['GET'])
+def api_cards_list():
+    phase    = request.args.get('phase')
+    verified = request.args.get('verified')
+    limit    = request.args.get('limit', 20, type=int)
+    cards = list_cards(phase=phase, verified=verified, limit=limit)
+    for c in cards:
+        if c.get('evidence'):
+            try: c['evidence'] = json.loads(c['evidence'])
+            except Exception: pass
+    return jsonify({'cards': cards, 'count': len(cards), 'stats': card_stats()})
+
+
+@app.route('/api/cards/<int:card_id>', methods=['GET'])
+def api_card_get(card_id):
+    c = get_card(card_id)
+    if not c:
+        return jsonify({'error': 'not found'}), 404
+    if c.get('evidence'):
+        try: c['evidence'] = json.loads(c['evidence'])
+        except Exception: pass
+    c['formatted'] = format_card(c)
+    return jsonify(c)
+
+
+@app.route('/api/cards', methods=['POST'])
+def api_card_add():
+    """
+    أضف بطاقة اكتشاف جديدة.
+    Body JSON:
+      question, result, number, evidence (dict),
+      phase (constants|patterns|exceptions),
+      surah_ref, ayah_ref, source_text, note
+    """
+    data = request.get_json()
+    if not data or not data.get('question') or not data.get('result'):
+        return jsonify({'error': 'question + result مطلوبان'}), 400
+
+    sid = open_session(data['question'])
+    cid = add_card(
+        session_id   = sid,
+        question     = data['question'],
+        result       = data['result'],
+        number       = data.get('number'),
+        evidence     = data.get('evidence', {}),
+        phase        = data.get('phase', 'constants'),
+        surah_ref    = data.get('surah_ref'),
+        ayah_ref     = data.get('ayah_ref'),
+        source_text  = data.get('source_text'),
+        note         = data.get('note'),
+    )
+    return jsonify({'card_id': cid, 'session_id': sid, 'status': 'added'})
+
+
+@app.route('/api/cards/<int:card_id>/verify', methods=['POST'])
+def api_card_verify(card_id):
+    data = request.get_json() or {}
+    status = data.get('status', 'verified')
+    if status not in ('verified', 'rejected', 'pending'):
+        return jsonify({'error': 'status: verified|rejected|pending'}), 400
+    verify_card(card_id, status)
+    return jsonify({'card_id': card_id, 'verified': status})
+
+
+@app.route('/api/session/open', methods=['POST'])
+def api_session_open():
+    """افتح جلسة بسؤال — قانون التوقف: سؤال واحد."""
+    data = request.get_json()
+    if not data or not data.get('question'):
+        return jsonify({'error': 'question مطلوب'}), 400
+
+    # تحذير: هل يوجد جلسة مفتوحة؟
+    current = get_open_session()
+    if current:
+        return jsonify({
+            'warning': 'جلسة مفتوحة بالفعل — أغلقها أولاً',
+            'open_session': current
+        }), 409
+
+    sid = open_session(data['question'])
+    return jsonify({'session_id': sid, 'question': data['question'], 'status': 'opened'})
+
+
+@app.route('/api/session/current', methods=['GET'])
+def api_session_current():
+    s = get_open_session()
+    if not s:
+        return jsonify({'status': 'no_open_session'})
+    return jsonify(s)
+
+
+@app.route('/api/probe', methods=['GET', 'POST'])
+def api_probe():
+    """استنباط سريع — أعطِ نصاً واحصل على جُمَّله + الآيات المشابهة"""
+    if request.method == 'GET':
+        text = request.args.get('q', '')
+    else:
+        data = request.get_json() or {}
+        text = data.get('text', '')
+    if not text:
+        return jsonify({'error': 'q أو text مطلوب'}), 400
+    return jsonify(quick_probe(text))
 
 
 if __name__ == '__main__':
