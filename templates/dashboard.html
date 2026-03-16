@@ -4,69 +4,290 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لله — محرك الجُمَّل القرآني</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Outfit:wght@300;400;500;600&family=Noto+Kufi+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0a0a1a;--card:#12122a;--border:#1e1e3a;--gold:#d4a853;--green:#4ecdc4;--text:#e8e8f0;--dim:#888;--accent:#6366f1}
-body{font-family:'Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl}
-.header{text-align:center;padding:20px 15px 10px;background:linear-gradient(135deg,#0d0d2b,#1a1040)}
-.header h1{font-size:28px;color:var(--gold);margin-bottom:4px}
-.header .sub{color:var(--dim);font-size:13px}
-.tabs{display:flex;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--border);padding:0 5px;-webkit-overflow-scrolling:touch}
-.tabs button{flex-shrink:0;background:none;border:none;color:var(--dim);padding:12px 16px;font-size:14px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit}
-.tabs button.active{color:var(--gold);border-bottom-color:var(--gold)}
-.content{padding:12px;max-width:800px;margin:0 auto}
-.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
-.card h3{color:var(--gold);font-size:16px;margin-bottom:10px}
+:root{
+  --gold:#c9a96e;
+  --gold-light:#dfc08a;
+  --gold-dark:#a07d45;
+  --bg:#07070a;
+  --bg2:#0d0d12;
+  --glass:rgba(22,22,30,0.55);
+  --glass2:rgba(14,14,20,0.8);
+  --border:rgba(201,169,110,0.12);
+  --border-h:rgba(201,169,110,0.28);
+  --text:#f0ece4;
+  --dim:#8a8690;
+  --muted:#55515d;
+  --green:#5ecfb1;
+  --accent:#c9a96e;
+  --radius:16px;
+  --radius-sm:10px;
+}
+body{font-family:'Outfit','Noto Kufi Arabic',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl;-webkit-font-smoothing:antialiased}
+
+/* ─── نسيج الضوضاء ─── */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E")}
+
+/* ─── الترويسة ─── */
+.header{
+  position:relative;overflow:hidden;
+  padding:48px 20px 32px;
+  text-align:center;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,169,110,0.09) 0%, transparent 70%);
+  border-bottom:1px solid var(--border);
+}
+/* شبكة الخلفية */
+.header::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(201,169,110,0.04) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(201,169,110,0.04) 1px,transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 70% 100% at 50% 0%,black 0%,transparent 80%);
+}
+/* كرة الضوء */
+.header::after{
+  content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);
+  width:320px;height:320px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(201,169,110,0.1) 0%,rgba(201,169,110,0.03) 40%,transparent 70%);
+}
+.header-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(201,169,110,0.07);
+  border:1px solid var(--border);
+  border-radius:100px;padding:5px 14px;
+  font-size:11px;color:var(--dim);
+  font-family:'Outfit',sans-serif;
+  letter-spacing:0.04em;
+  margin-bottom:20px;
+  position:relative;z-index:1;
+}
+.header-badge .dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--gold);
+  box-shadow:0 0 8px rgba(201,169,110,0.6);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.header-logo{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.4rem,6vw,4rem);
+  font-weight:400;
+  color:var(--text);
+  line-height:1;
+  margin-bottom:10px;
+  position:relative;z-index:1;
+  letter-spacing:0.02em;
+}
+.header-logo span{
+  color:var(--gold);
+  font-style:italic;
+}
+.header-ar{
+  font-family:'Noto Kufi Arabic',sans-serif;
+  font-size:1.05rem;font-weight:300;
+  color:var(--gold-light);
+  margin-bottom:10px;
+  position:relative;z-index:1;
+  letter-spacing:0.01em;
+}
+.header-sub{
+  font-size:0.78rem;color:var(--dim);
+  font-family:'Outfit',sans-serif;
+  position:relative;z-index:1;
+  letter-spacing:0.06em;
+}
+.header-stats{
+  display:flex;justify-content:center;gap:24px;
+  margin-top:20px;position:relative;z-index:1;
+  flex-wrap:wrap;
+}
+.h-stat{text-align:center}
+.h-stat .val{font-size:1.1rem;font-weight:600;color:var(--gold);display:block;font-family:'Outfit',sans-serif}
+.h-stat .lbl{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;font-family:'Outfit',sans-serif}
+
+/* ─── التبويبات ─── */
+.tabs{
+  display:flex;overflow-x:auto;
+  background:var(--glass2);
+  border-bottom:1px solid var(--border);
+  padding:0 8px;
+  -webkit-overflow-scrolling:touch;
+  backdrop-filter:blur(12px);
+  position:sticky;top:0;z-index:100;
+}
+.tabs::-webkit-scrollbar{height:0}
+.tabs button{
+  flex-shrink:0;background:none;border:none;
+  color:var(--dim);padding:14px 18px;
+  font-size:13px;cursor:pointer;
+  border-bottom:2px solid transparent;
+  white-space:nowrap;
+  font-family:'Outfit','Noto Kufi Arabic',sans-serif;
+  font-weight:400;
+  transition:color .25s,border-color .25s;
+  letter-spacing:0.01em;
+}
+.tabs button:hover{color:var(--gold-light)}
+.tabs button.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:500}
+
+/* ─── المحتوى ─── */
+.content{padding:16px 12px;max-width:820px;margin:0 auto;position:relative;z-index:1}
+
+/* ─── الكروت ─── */
+.card{
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px;margin-bottom:14px;
+  backdrop-filter:blur(8px);
+  transition:border-color .25s;
+}
+.card:hover{border-color:var(--border-h)}
+.card h3{
+  color:var(--gold);
+  font-size:14px;font-weight:500;
+  margin-bottom:12px;
+  font-family:'Noto Kufi Arabic',sans-serif;
+  display:flex;align-items:center;gap:6px;
+}
+.card h3::after{content:'';flex:1;height:1px;background:var(--border)}
+
 .section{display:none}
 .section.active{display:block}
-input[type=text],input[type=number],select{width:100%;padding:10px 12px;background:#1a1a35;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:15px;font-family:inherit;direction:rtl;margin-bottom:8px}
-input:focus{outline:none;border-color:var(--gold)}
-button.btn{background:var(--gold);color:#000;border:none;padding:10px 20px;border-radius:8px;font-size:14px;cursor:pointer;font-family:inherit;width:100%}
-button.btn:active{opacity:.8}
+
+/* ─── المدخلات ─── */
+input[type=text],input[type=number],select{
+  width:100%;padding:11px 14px;
+  background:rgba(7,7,10,0.7);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  color:var(--text);font-size:14px;
+  font-family:'Outfit','Noto Kufi Arabic',sans-serif;
+  direction:rtl;margin-bottom:8px;
+  transition:border-color .2s;
+}
+input:focus,select:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,110,0.08)}
+select option{background:#0d0d12}
+
+/* ─── الأزرار ─── */
+button.btn{
+  background:var(--gold);color:#07070a;
+  border:none;padding:11px 20px;
+  border-radius:var(--radius-sm);
+  font-size:13px;font-weight:600;
+  cursor:pointer;
+  font-family:'Outfit','Noto Kufi Arabic',sans-serif;
+  width:100%;letter-spacing:0.02em;
+  transition:background .2s,box-shadow .2s;
+}
+button.btn:hover{background:var(--gold-light);box-shadow:0 0 20px rgba(201,169,110,0.25)}
+button.btn:active{background:var(--gold-dark)}
+
 .result{margin-top:10px;min-height:40px}
+
+/* ─── الجداول ─── */
 table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:8px 6px;border-bottom:1px solid var(--border);text-align:right}
-th{color:var(--gold);font-size:12px}
-.num{color:var(--green);font-weight:bold;direction:ltr;text-align:center}
-.badge{display:inline-block;background:var(--accent);color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;margin:2px}
+th,td{padding:9px 8px;border-bottom:1px solid var(--border);text-align:right}
+th{color:var(--gold);font-size:11px;font-weight:500;letter-spacing:0.05em;font-family:'Outfit',sans-serif;text-transform:uppercase}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(201,169,110,0.03)}
+.num{color:var(--green);font-weight:600;direction:ltr;text-align:center;font-family:'Outfit',sans-serif}
+
+/* ─── باقي العناصر ─── */
+.badge{display:inline-block;background:rgba(201,169,110,0.12);color:var(--gold);border:1px solid rgba(201,169,110,0.2);padding:2px 9px;border-radius:100px;font-size:11px;margin:2px}
 .grid10{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;font-size:10px;direction:ltr}
-.grid10 .cell{background:#1a1a35;padding:4px 2px;text-align:center;border-radius:4px;line-height:1.3}
-.grid10 .cell .n{color:var(--gold);font-size:9px;display:block}
-.grid10 .cell .v{color:var(--green);font-size:10px;font-weight:bold}
-.diag{background:#2a1a40 !important}
+.grid10 .cell{background:rgba(22,22,30,0.8);padding:5px 2px;text-align:center;border-radius:6px;line-height:1.3;border:1px solid transparent;transition:border-color .15s}
+.grid10 .cell:hover{border-color:var(--border-h)}
+.grid10 .cell .n{color:var(--gold);font-size:8px;display:block;font-family:'Outfit',sans-serif}
+.grid10 .cell .v{color:var(--green);font-size:10px;font-weight:bold;font-family:'Outfit',sans-serif}
+.diag{background:rgba(201,169,110,0.08) !important;border-color:var(--border) !important}
 .breakdown{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.breakdown .letter-box{background:#1a1a35;padding:6px 10px;border-radius:6px;text-align:center}
-.breakdown .letter-box .ch{font-size:18px;color:var(--gold)}
-.breakdown .letter-box .val{font-size:11px;color:var(--green)}
-.stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.breakdown .letter-box{background:rgba(14,14,20,0.8);border:1px solid var(--border);padding:7px 11px;border-radius:var(--radius-sm);text-align:center;transition:border-color .2s}
+.breakdown .letter-box:hover{border-color:var(--border-h)}
+.breakdown .letter-box .ch{font-size:20px;color:var(--gold);font-family:'Noto Kufi Arabic',sans-serif}
+.breakdown .letter-box .val{font-size:11px;color:var(--green);font-family:'Outfit',sans-serif}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
 .stat-row:last-child{border:none}
-.stat-label{color:var(--dim)}
-.stat-val{color:var(--green);font-weight:bold}
-.loading{text-align:center;color:var(--dim);padding:20px}
-.search-type{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
-.search-type button{background:#1a1a35;border:1px solid var(--border);color:var(--dim);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit}
-.search-type button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.axis-card{background:#1a1a35;border-radius:8px;padding:10px;margin-bottom:8px}
-.axis-letter{font-size:28px;color:var(--gold);float:left;margin-right:10px;margin-left:0;width:40px;text-align:center}
-.axis-detail{font-size:12px;line-height:1.8}
-.axis-detail span{color:var(--dim)}
-.pair{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid #1a1a35}
+.stat-label{color:var(--dim);font-size:13px}
+.stat-val{color:var(--green);font-weight:600;font-family:'Outfit',sans-serif}
+.loading{text-align:center;color:var(--muted);padding:24px;font-size:13px}
+.loading::after{content:' ·';animation:ldot 1s infinite}
+@keyframes ldot{0%,100%{opacity:1}50%{opacity:.2}}
+.search-type{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.search-type button{
+  background:rgba(14,14,20,0.8);
+  border:1px solid var(--border);
+  color:var(--dim);padding:7px 14px;
+  border-radius:100px;font-size:12px;
+  cursor:pointer;
+  font-family:'Outfit','Noto Kufi Arabic',sans-serif;
+  transition:all .2s;
+}
+.search-type button:hover{border-color:var(--border-h);color:var(--text)}
+.search-type button.active{background:rgba(201,169,110,0.12);border-color:rgba(201,169,110,0.35);color:var(--gold)}
+.axis-card{background:rgba(14,14,20,0.6);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;transition:border-color .2s}
+.axis-card:hover{border-color:var(--border-h)}
+.axis-letter{font-size:30px;color:var(--gold);float:left;margin-right:12px;margin-left:0;width:40px;text-align:center;font-family:'Noto Kufi Arabic',sans-serif}
+.axis-detail{font-size:12px;line-height:1.9;font-family:'Noto Kufi Arabic',sans-serif}
+.axis-detail span{color:var(--muted)}
+.pair{display:flex;justify-content:space-between;padding:7px 0;font-size:13px;border-bottom:1px solid rgba(201,169,110,0.06)}
 .pair:last-child{border:none}
-.scroll-hint{text-align:center;color:var(--dim);font-size:11px;margin-top:4px}
-@media(max-width:400px){.grid10{font-size:8px}.grid10 .cell{padding:2px 1px}.grid10 .cell .n{font-size:7px}.grid10 .cell .v{font-size:8px}}
+.scroll-hint{text-align:center;color:var(--muted);font-size:11px;margin-top:6px;font-family:'Outfit',sans-serif}
+
+/* ─── الفوتر ─── */
+.footer{
+  text-align:center;padding:28px 20px;
+  color:var(--muted);font-size:11px;
+  border-top:1px solid var(--border);
+  font-family:'Outfit',sans-serif;
+  letter-spacing:0.04em;
+  position:relative;z-index:1;
+}
+.footer a{color:var(--gold-dark);text-decoration:none}
+.footer .sep{margin:0 8px;opacity:.3}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--gold-dark);border-radius:10px}
+
+@media(max-width:400px){
+  .grid10{font-size:8px}.grid10 .cell{padding:3px 1px}
+  .grid10 .cell .n{font-size:7px}.grid10 .cell .v{font-size:9px}
+  .header-stats{gap:16px}
+  .tabs button{padding:12px 14px;font-size:12px}
+}
 </style>
 </head>
 <body>
-<div class="header">
-<h1>لله</h1>
-<div class="sub">محرك الجُمَّل القرآني + محاور ابن عربي — 3+6+9=18→9</div>
-</div>
+
+<!-- ═══ الترويسة ═══ -->
+<header class="header">
+  <div class="header-badge">
+    <span class="dot"></span>
+    محرك الجُمَّل القرآني · النسخة 3
+  </div>
+  <div class="header-logo">لِـ<span>لَّـه</span></div>
+  <div class="header-ar">محرك الجُمَّل القرآني + محاور ابن عربي</div>
+  <div class="header-sub">3 + 6 + 9 = 18 → 9 &nbsp;·&nbsp; ١١٤ سورة &nbsp;·&nbsp; ٩٩ اسماً</div>
+  <div class="header-stats">
+    <div class="h-stat"><span class="val">١١٤</span><span class="lbl">سورة</span></div>
+    <div class="h-stat"><span class="val">٦٢٣٦</span><span class="lbl">آية</span></div>
+    <div class="h-stat"><span class="val">٩٩</span><span class="lbl">اسماً</span></div>
+    <div class="h-stat"><span class="val">٢٨</span><span class="lbl">محوراً</span></div>
+    <div class="h-stat"><span class="val">٥</span><span class="lbl">أنظمة</span></div>
+  </div>
+</header>
 
 <div class="tabs">
 <button class="active" onclick="showTab('square')">المعشّر</button>
 <button onclick="showTab('axes')">المحاور</button>
 <button onclick="showTab('jummal')">حساب الجُمَّل</button>
 <button onclick="showTab('search')">البحث</button>
+<button onclick="showTab('systems')">الأنظمة</button>
 <button onclick="showTab('stats')">الإحصاء</button>
 </div>
 
@@ -179,6 +400,85 @@ th{color:var(--gold);font-size:12px}
 </div>
 </div>
 
+<!-- ═══ الأنظمة ═══ -->
+<div id="tab-systems" class="section">
+
+<!-- حساب النص بكل الأنظمة -->
+<div class="card">
+<h3>🧮 احسب بكل الأنظمة</h3>
+<input type="text" id="sys-text" placeholder="اكتب نصاً عربياً... مثال: الله أكبر">
+<button class="btn" onclick="calcSystems()">احسب ×5</button>
+<div id="sys-text-result" class="result"></div>
+</div>
+
+<!-- حساب آية بكل الأنظمة -->
+<div class="card">
+<h3>📖 آية بكل الأنظمة</h3>
+<div style="display:flex;gap:8px;margin-bottom:8px">
+  <input type="number" id="sys-surah" placeholder="السورة" style="flex:1;margin:0">
+  <input type="number" id="sys-aya" placeholder="الآية" style="flex:1;margin:0">
+  <button class="btn" onclick="calcAyahSystems()" style="width:auto;padding:10px 16px;margin:0">احسب</button>
+</div>
+<div id="sys-ayah-result" class="result"></div>
+</div>
+
+<!-- بحث متقدم عبر الأنظمة -->
+<div class="card">
+<h3>🔍 بحث متقدم عبر الأنظمة</h3>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+  <div style="flex:1;min-width:120px">
+    <div style="font-size:11px;color:var(--dim);margin-bottom:4px">بحث بـ</div>
+    <div class="search-type" style="margin:0">
+      <button class="active" id="stype-val" onclick="setSysSearchType('value',this)">قيمة</button>
+      <button id="stype-dr" onclick="setSysSearchType('dr',this)">جذر</button>
+    </div>
+  </div>
+  <div style="flex:1;min-width:80px">
+    <div style="font-size:11px;color:var(--dim);margin-bottom:4px">الرقم</div>
+    <input type="number" id="sys-search-num" placeholder="786" style="margin:0">
+  </div>
+  <div style="flex:1;min-width:100px">
+    <div style="font-size:11px;color:var(--dim);margin-bottom:4px">النظام</div>
+    <select id="sys-search-system" style="margin:0">
+      <option value="0">كل الأنظمة</option>
+      <option value="1">الجُمَّل الكبير</option>
+      <option value="2">الجُمَّل الصغير</option>
+      <option value="3">الترتيب الأبجدي</option>
+      <option value="4">عدد الحروف</option>
+      <option value="5">الخاص-6</option>
+    </select>
+  </div>
+  <div style="flex:1;min-width:100px">
+    <div style="font-size:11px;color:var(--dim);margin-bottom:4px">أدنى تطابق</div>
+    <select id="sys-min-systems" style="margin:0">
+      <option value="1">نظام واحد+</option>
+      <option value="2">نظامان+</option>
+      <option value="3" selected>3 أنظمة+</option>
+      <option value="4">4 أنظمة+</option>
+      <option value="5">كل الأنظمة</option>
+    </select>
+  </div>
+</div>
+<button class="btn" onclick="searchAcrossSystems()">بحث</button>
+<div id="sys-search-result" class="result"></div>
+</div>
+
+<!-- الاكتشافات التلقائية -->
+<div class="card">
+<h3>💡 اكتشافات المراقب</h3>
+<div class="search-type" style="margin-bottom:8px">
+  <button class="active" onclick="loadDiscoveries('',this)">الكل</button>
+  <button onclick="loadDiscoveries('tesla_pattern',this)">تيسلا</button>
+  <button onclick="loadDiscoveries('cross_system_consensus',this)">الإجماع</button>
+  <button onclick="loadDiscoveries('divisor_pattern',this)">القواسم</button>
+  <button onclick="loadDiscoveries('word_pattern',this)">الكلمات</button>
+  <button onclick="loadDiscoveries('surah_consistent_dr',this)">السور</button>
+</div>
+<div id="sys-discoveries" class="loading">جارٍ التحميل...</div>
+</div>
+
+</div>
+
 <!-- ═══ الإحصاء ═══ -->
 <div id="tab-stats" class="section">
 <div class="card">
@@ -197,9 +497,15 @@ th{color:var(--gold);font-size:12px}
 
 </div>
 
-<div style="text-align:center;padding:20px;color:var(--dim);font-size:11px">
-d369 — الملكية الفكرية: عماد سليمان علوان<br>
-3 + 6 + 9 = 18 → 9
+<div class="footer">
+  <div style="margin-bottom:6px">
+    <span style="color:var(--gold);font-size:13px;font-family:'Noto Kufi Arabic',sans-serif">لِلَّه</span>
+  </div>
+  الملكية الفكرية: عماد سليمان علوان
+  <span class="sep">·</span>
+  <a href="https://up2b.ai">up2b.ai</a>
+  <span class="sep">·</span>
+  3 + 6 + 9 = 18 → 9
 </div>
 
 <script>
@@ -478,16 +784,181 @@ async function loadStats() {
   }
 }
 
+// ═══ الأنظمة ═══
+
+const SYS_NAMES = {
+  kabir:       'الجُمَّل الكبير',
+  saghir:      'الجُمَّل الصغير',
+  ordinal:     'الترتيب الأبجدي',
+  lettercount: 'عدد الحروف',
+  special6:    'الخاص-6',
+};
+const SYS_ICONS = {kabir:'📊', saghir:'🔹', ordinal:'🔢', lettercount:'🔤', special6:'⚡'};
+
+function renderSystemsTable(systems) {
+  if (!systems || !systems.length) return '<div style="color:var(--dim)">لا توجد بيانات</div>';
+  let html = '<table><tr><th>النظام</th><th>القيمة</th><th>الجذر</th></tr>';
+  systems.forEach(s => {
+    const name = s.name_ar || SYS_NAMES[s.name] || s.name;
+    const icon = SYS_ICONS[s.name] || '•';
+    const val  = s.value  !== undefined ? s.value  : (s.value  || '—');
+    const dr   = s.digit_root !== undefined ? s.digit_root : (s.dr || '—');
+    const highlight = (dr == 9) ? 'color:var(--gold)' : (dr == 3 || dr == 6) ? 'color:var(--green)' : '';
+    html += `<tr><td>${icon} ${name}</td><td class="num">${(+val).toLocaleString()}</td><td class="num" style="${highlight}"><b>${dr}</b></td></tr>`;
+  });
+  html += '</table>';
+  return html;
+}
+
+function drBadge(dr) {
+  const colors = {3:'#4ecdc4', 6:'#6366f1', 9:'#d4a853', 4:'#e8733a', 1:'#888', 2:'#888', 5:'#888', 7:'#888', 8:'#888'};
+  return `<span style="background:${colors[dr]||'#333'};color:#000;padding:2px 7px;border-radius:10px;font-size:12px;font-weight:bold">${dr}</span>`;
+}
+
+async function calcSystems() {
+  const text = document.getElementById('sys-text').value.trim();
+  if (!text) return;
+  const el = document.getElementById('sys-text-result');
+  el.innerHTML = '<div class="loading">جارٍ الحساب...</div>';
+  const d = await api('/api/calc?text=' + encodeURIComponent(text));
+  if (d.error) { el.innerHTML = `<div style="color:#e55">${d.error}</div>`; return; }
+  // بناء مصفوفة من القاموس
+  const systems = Object.entries(d.systems).map(([name, v]) => ({name, name_ar: SYS_NAMES[name], value: v.value, digit_root: v.digit_root}));
+  // استخراج الجذور
+  const drs = systems.map(s => s.digit_root);
+  const consensus = drs.filter((v,i,a) => a.indexOf(v) === i).length === 1;
+  let html = `<div style="font-size:15px;color:var(--gold);margin-bottom:8px">${text}</div>`;
+  if (consensus) html += `<div style="background:#1a2a1a;padding:6px 10px;border-radius:6px;margin-bottom:8px;font-size:12px;color:var(--green)">✅ إجماع — كل الأنظمة تعطي جذر ${drs[0]}</div>`;
+  html += renderSystemsTable(systems);
+  // نقاط مثيرة
+  const dr9 = drs.filter(d => d==9).length;
+  const dr3 = drs.filter(d => d==3).length;
+  const dr6 = drs.filter(d => d==6).length;
+  if (dr9 > 0) html += `<div style="margin-top:8px;font-size:12px;color:var(--gold)">تيسلا: ${dr9} نظام على 9, ${dr3} على 3, ${dr6} على 6</div>`;
+  el.innerHTML = html;
+}
+
+async function calcAyahSystems() {
+  const surah = document.getElementById('sys-surah').value;
+  const aya   = document.getElementById('sys-aya').value;
+  if (!surah || !aya) return;
+  const el = document.getElementById('sys-ayah-result');
+  el.innerHTML = '<div class="loading">جارٍ الجلب...</div>';
+  const d = await api(`/api/calc/ayah?surah=${surah}&aya=${aya}`);
+  if (d.error) { el.innerHTML = `<div style="color:#e55">${d.error}</div>`; return; }
+  let html = '';
+  if (d.text) html += `<div style="font-size:15px;color:var(--gold);line-height:2;margin-bottom:10px">${d.text}</div>`;
+  if (d.systems && d.systems.length) {
+    const drs = d.systems.map(s => s.dr);
+    const tesla = drs.filter(dr => [3,6,9].includes(dr));
+    if (tesla.length === drs.length) html += `<div style="background:#2a1a2a;padding:6px 10px;border-radius:6px;margin-bottom:8px;font-size:12px;color:var(--gold)">⚡ آية تيسلا — كل الأنظمة ${[...new Set(drs)].join('،')} (نسب التسعة)</div>`;
+    html += '<table><tr><th>النظام</th><th>القيمة</th><th>الجذر</th></tr>';
+    d.systems.forEach(s => {
+      const icon = SYS_ICONS[s.name] || '•';
+      const highlight = [3,6,9].includes(s.dr) ? 'color:var(--gold)' : '';
+      html += `<tr><td>${icon} ${s.name_ar}</td><td class="num">${(s.value||0).toLocaleString()}</td><td class="num" style="${highlight}"><b>${s.dr}</b></td></tr>`;
+    });
+    html += '</table>';
+  }
+  el.innerHTML = html;
+}
+
+let sysSearchType = 'value';
+function setSysSearchType(type, btn) {
+  sysSearchType = type;
+  ['stype-val','stype-dr'].forEach(id => document.getElementById(id).classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('sys-search-num').placeholder = type === 'value' ? '786' : '1-9';
+}
+
+async function searchAcrossSystems() {
+  const num = document.getElementById('sys-search-num').value;
+  const system = document.getElementById('sys-search-system').value;
+  const minSys = document.getElementById('sys-min-systems').value;
+  if (!num) return;
+  const el = document.getElementById('sys-search-result');
+  el.innerHTML = '<div class="loading">جارٍ البحث...</div>';
+  const param = sysSearchType === 'value' ? `value=${num}` : `dr=${num}`;
+  const d = await api(`/api/calc/search?${param}&system=${system}&min_systems=${minSys}&limit=30`);
+  if (!d.results || !d.results.length) {
+    el.innerHTML = '<div style="color:var(--dim)">لا توجد نتائج</div>'; return;
+  }
+  let html = `<div style="color:var(--dim);font-size:12px;margin-bottom:6px">${d.results.length} نتيجة</div>`;
+  html += '<table><tr><th>السورة:الآية</th>';
+  html += sysSearchType === 'value' ? '<th>القيمة</th>' : '<th>عدد الأنظمة</th>';
+  html += '</tr>';
+  d.results.forEach(r => {
+    html += `<tr><td class="num" style="cursor:pointer;color:var(--gold)" onclick="fillAyah(${r.surah},${r.aya})">${r.surah}:${r.aya}</td>`;
+    html += sysSearchType === 'value'
+      ? `<td class="num">${r.value||num}</td>`
+      : `<td class="num">${r.cnt||1} <span style="font-size:10px;color:var(--dim)">أنظمة</span></td>`;
+    html += '</tr>';
+  });
+  html += '</table><div style="font-size:11px;color:var(--dim);margin-top:6px">اضغط على رقم الآية للحساب الكامل</div>';
+  el.innerHTML = html;
+}
+
+function fillAyah(surah, aya) {
+  document.getElementById('sys-surah').value = surah;
+  document.getElementById('sys-aya').value = aya;
+  calcAyahSystems();
+  document.getElementById('sys-ayah-result').scrollIntoView({behavior:'smooth'});
+}
+
+const CAT_AR = {
+  tesla_pattern: 'تيسلا ⚡',
+  cross_system_consensus: 'إجماع الأنظمة 🔗',
+  divisor_pattern: 'القواسم 🔢',
+  word_pattern: 'الكلمات 📝',
+  surah_consistent_dr: 'ثبات السورة 📖',
+};
+
+async function loadDiscoveries(category, btn) {
+  if (btn) {
+    btn.closest('.search-type').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  const el = document.getElementById('sys-discoveries');
+  el.innerHTML = '<div class="loading">جارٍ التحميل...</div>';
+  const q = category ? `?category=${category}&limit=25` : '?limit=25';
+  const d = await api('/api/calc/discoveries' + q);
+  if (!d.discoveries || !d.discoveries.length) {
+    el.innerHTML = '<div style="color:var(--dim)">لا توجد اكتشافات — شغّل /observe في البوت</div>'; return;
+  }
+  let html = `<div style="color:var(--dim);font-size:12px;margin-bottom:8px">${d.discoveries.length} اكتشاف</div>`;
+  d.discoveries.forEach(disc => {
+    const cat = CAT_AR[disc.category] || disc.category;
+    const conf = Math.round((disc.confidence || 0) * 100);
+    const confColor = conf >= 90 ? 'var(--gold)' : conf >= 70 ? 'var(--green)' : 'var(--dim)';
+    const ev = disc.evidence || {};
+    html += `<div style="background:#1a1a35;border-radius:8px;padding:10px;margin-bottom:8px;border-right:3px solid var(--accent)">`;
+    html += `<div style="display:flex;justify-content:space-between;margin-bottom:4px">`;
+    html += `<span style="font-size:11px;color:var(--dim)">${cat}</span>`;
+    html += `<span style="font-size:11px;color:${confColor}">${conf}%</span></div>`;
+    html += `<div style="font-size:14px;color:var(--text);margin-bottom:4px">${disc.claim}</div>`;
+    if (ev.surah && ev.aya) {
+      html += `<span style="font-size:11px;color:var(--gold);cursor:pointer" onclick="fillAyah(${ev.surah},${ev.aya})">← احسب هذه الآية بكل الأنظمة</span>`;
+    } else if (ev.word) {
+      html += `<span style="font-size:11px;color:var(--green)">${ev.word} = ${ev.value}</span>`;
+    }
+    html += `</div>`;
+  });
+  el.innerHTML = html;
+}
+
 // Enter key handlers
 document.addEventListener('DOMContentLoaded', () => {
   loadSquare();
   loadAxes();
   loadStats();
+  loadDiscoveries('');
   document.getElementById('jummal-input').addEventListener('keydown', e => { if (e.key === 'Enter') calcJummal(); });
   document.getElementById('jummal-value').addEventListener('keydown', e => { if (e.key === 'Enter') searchByValue(); });
   document.getElementById('match-input').addEventListener('keydown', e => { if (e.key === 'Enter') findMatches(); });
   document.getElementById('name-input').addEventListener('keydown', e => { if (e.key === 'Enter') searchName(); });
   document.getElementById('divisor-num').addEventListener('keydown', e => { if (e.key === 'Enter') searchDivisors(); });
+  document.getElementById('sys-text').addEventListener('keydown', e => { if (e.key === 'Enter') calcSystems(); });
+  document.getElementById('sys-search-num').addEventListener('keydown', e => { if (e.key === 'Enter') searchAcrossSystems(); });
 });
 </script>
 </body>
