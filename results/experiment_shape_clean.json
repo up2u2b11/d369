@@ -1,0 +1,103 @@
+{
+  "experiment": "shape_clean_decomposition",
+  "date": "2026-03-27T11:14:27.470001+03:00",
+  "baseline": {
+    "k6": {
+      "units": 114,
+      "in_369": 51,
+      "proportion": 0.4474,
+      "p_value": 0.007374,
+      "significant": true
+    },
+    "lc": {
+      "units": 114,
+      "in_369": 48,
+      "proportion": 0.4211,
+      "p_value": 0.031162,
+      "significant": true
+    }
+  },
+  "modular_residual": {
+    "units": 114,
+    "in_369": 47,
+    "proportion": 0.4123,
+    "p_value": 0.047306,
+    "significant": true
+  },
+  "middle_50_pct": {
+    "range": "middle 50% (401-3628 letters)",
+    "k6": {
+      "units": 57,
+      "in_369": 21,
+      "proportion": 0.3684,
+      "p_value": 0.332195,
+      "significant": false
+    }
+  },
+  "bands": {
+    "short (≤401 letters)": {
+      "k6": {
+        "units": 29,
+        "in_369": 17,
+        "proportion": 0.5862,
+        "p_value": 0.004523,
+        "significant": true
+      },
+      "lc": {
+        "units": 29,
+        "in_369": 9,
+        "proportion": 0.3103,
+        "p_value": 0.670266,
+        "significant": false
+      }
+    },
+    "medium (402-1488 letters)": {
+      "k6": {
+        "units": 29,
+        "in_369": 8,
+        "proportion": 0.2759,
+        "p_value": 0.801422,
+        "significant": false
+      },
+      "lc": {
+        "units": 29,
+        "in_369": 12,
+        "proportion": 0.4138,
+        "p_value": 0.232086,
+        "significant": false
+      }
+    },
+    "long (1489-3897 letters)": {
+      "k6": {
+        "units": 28,
+        "in_369": 13,
+        "proportion": 0.4643,
+        "p_value": 0.103924,
+        "significant": false
+      },
+      "lc": {
+        "units": 28,
+        "in_369": 11,
+        "proportion": 0.3929,
+        "p_value": 0.31411,
+        "significant": false
+      }
+    },
+    "very long (>3897 letters)": {
+      "k6": {
+        "units": 28,
+        "in_369": 13,
+        "proportion": 0.4643,
+        "p_value": 0.103924,
+        "significant": false
+      },
+      "lc": {
+        "units": 28,
+        "in_369": 16,
+        "proportion": 0.5714,
+        "p_value": 0.008154,
+        "significant": true
+      }
+    }
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "experiment": "d369_all_systems_comparison",
+  "date": "2026-03-27T11:06:55.968916+03:00",
+  "method": "digit_root_binomial_test_5_systems",
+  "expected_proportion": 0.333333,
+  "alpha": 0.05,
+  "systems": [
+    "abjad",
+    "k6",
+    "saghir",
+    "ordinal",
+    "lettercount"
+  ],
+  "results": {
+    "abjad": {
+      "name": "Abjad Kabir (traditional)",
+      "texts": {
+        "text_a": {
+          "identity": "القرآن الكريم",
+          "units": 114,
+          "in_369": 35,
+          "proportion": 0.307,
+          "p_value": 0.754706,
+          "significant": false
+        },
+        "text_b": {
+          "identity": "صحيح البخاري",
+          "units": 114,
+          "in_369": 41,
+          "proportion": 0.3596,
+          "p_value": 0.306863,
+          "significant": false
+        },
+        "text_c": {
+          "identity": "المعلقات السبع",
+          "units": 78,
+          "in_369": 28,
+          "proportion": 0.359,
+          "p_value": 0.355094,
+          "significant": false
+        }
+      }
+    },
+    "k6": {
+      "name": "K6 Special-6",
+      "texts": {
+        "text_a": {
+          "identity": "القرآن الكريم",
+          "units": 114,
+          "in_369": 51,
+          "proportion": 0.4474,
+          "p_value": 0.007374,
+          "significant": true
+        },
+        "text_b": {
+          "identity": "صحيح البخاري",
+          "units": 114,
+          "in_369": 40,
+          "proportion": 0.3509,
+          "p_value": 0.37908,
+          "significant": false
+        },
+        "text_c": {
+          "identity": "المعلقات السبع",
+          "units": 78,
+          "in_369": 29,
+          "proportion": 0.3718,
+          "p_value": 0.271373,
+          "significant": false
+        }
+      }
+    },
+    "saghir": {
+      "name": "Abjad Saghir (digit-root per letter)",
+      "texts": {
+        "text_a": {
+          "identity": "القرآن الكريم",
+          "units": 114,
+          "in_369": 35,
+          "proportion": 0.307,
+          "p_value": 0.754706,
+          "significant": false
+        },
+        "text_b": {
+          "identity": "صحيح البخاري",
+          "units": 114,
+          "in_369": 41,
+          "proportion": 0.3596,
+          "p_value": 0.306863,
+          "significant": false
+        },
+        "text_c": {
+          "identity": "المعلقات السبع",
+          "units": 78,
+          "in_369": 28,
+          "proportion": 0.359,
+          "p_value": 0.355094,
+          "significant": false
+        }
+      }
+    },
+    "ordinal": {
+      "name": "Ordinal (position 1-28)",
+      "texts": {
+        "text_a": {
+          "identity": "القرآن الكريم",
+          "units": 114,
+          "in_369": 35,
+          "proportion": 0.307,
+          "p_value": 0.754706,
+          "significant": false
+        },
+        "text_b": {
+          "identity": "صحيح البخاري",
+          "units": 114,
+          "in_369": 41,
+          "proportion": 0.3596,
+          "p_value": 0.306863,
+          "significant": false
+        },
+        "text_c": {
+          "identity": "المعلقات السبع",
+          "units": 78,
+          "in_369": 28,
+          "proportion": 0.359,
+          "p_value": 0.355094,
+          "significant": false
+        }
+      }
+    },
+    "lettercount": {
+      "name": "Letter Count",
+      "texts": {
+        "text_a": {
+          "identity": "القرآن الكريم",
+          "units": 114,
+          "in_369": 48,
+          "proportion": 0.4211,
+          "p_value": 0.031162,
+          "significant": true
+        },
+        "text_b": {
+          "identity": "صحيح البخاري",
+          "units": 114,
+          "in_369": 39,
+          "proportion": 0.3421,
+          "p_value": 0.456112,
+          "significant": false
+        },
+        "text_c": {
+          "identity": "المعلقات السبع",
+          "units": 78,
+          "in_369": 29,
+          "proportion": 0.3718,
+          "p_value": 0.271373,
+          "significant": false
+        }
+      }
+    }
+  }
+}

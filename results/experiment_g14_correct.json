@@ -1,0 +1,316 @@
+{
+  "experiment": "g14_corrected_counting_property",
+  "date": "2026-03-27T11:27:52.923865+03:00",
+  "critical_insight": "G14 stability = d*(count-1) ≡ 0 (mod 9). Pure counting property.",
+  "stability_rules": {
+    "root_9": "ALWAYS stable",
+    "roots_3_6": "stable iff count ≡ 1 (mod 3) — prob ≈ 1/3",
+    "roots_1_2_4_5_7_8": "stable iff count ≡ 1 (mod 9) — prob ≈ 1/9"
+  },
+  "results": {
+    "text_a": {
+      "identity": "القرآن الكريم",
+      "n_units": 114,
+      "t_map": {
+        "1": {
+          "count": 14,
+          "group_sum": 2937227,
+          "group_dr_actual": 5,
+          "group_dr_formula": 5,
+          "stable": false,
+          "mod3": null,
+          "mod9": 5
+        },
+        "2": {
+          "count": 6,
+          "group_sum": 111216,
+          "group_dr_actual": 3,
+          "group_dr_formula": 3,
+          "stable": false,
+          "mod3": null,
+          "mod9": 6
+        },
+        "3": {
+          "count": 13,
+          "group_sum": 3210951,
+          "group_dr_actual": 3,
+          "group_dr_formula": 3,
+          "stable": true,
+          "mod3": 1,
+          "mod9": null
+        },
+        "4": {
+          "count": 13,
+          "group_sum": 1026997,
+          "group_dr_actual": 7,
+          "group_dr_formula": 7,
+          "stable": false,
+          "mod3": null,
+          "mod9": 4
+        },
+        "5": {
+          "count": 15,
+          "group_sum": 3588834,
+          "group_dr_actual": 3,
+          "group_dr_formula": 3,
+          "stable": false,
+          "mod3": null,
+          "mod9": 6
+        },
+        "6": {
+          "count": 10,
+          "group_sum": 2642856,
+          "group_dr_actual": 6,
+          "group_dr_formula": 6,
+          "stable": true,
+          "mod3": 1,
+          "mod9": null
+        },
+        "7": {
+          "count": 16,
+          "group_sum": 4054693,
+          "group_dr_actual": 4,
+          "group_dr_formula": 4,
+          "stable": false,
+          "mod3": null,
+          "mod9": 7
+        },
+        "8": {
+          "count": 15,
+          "group_sum": 2755353,
+          "group_dr_actual": 3,
+          "group_dr_formula": 3,
+          "stable": false,
+          "mod3": null,
+          "mod9": 6
+        },
+        "9": {
+          "count": 12,
+          "group_sum": 3147993,
+          "group_dr_actual": 9,
+          "group_dr_formula": 9,
+          "stable": true,
+          "mod3": null,
+          "mod9": null
+        }
+      },
+      "dr_counts": {
+        "4": 13,
+        "7": 16,
+        "9": 12,
+        "5": 15,
+        "6": 10,
+        "3": 13,
+        "1": 14,
+        "8": 15,
+        "2": 6
+      }
+    },
+    "text_b": {
+      "identity": "صحيح البخاري",
+      "n_units": 114,
+      "t_map": {
+        "1": {
+          "count": 6,
+          "group_sum": 1279545,
+          "group_dr_actual": 6,
+          "group_dr_formula": 6,
+          "stable": false,
+          "mod3": null,
+          "mod9": 6
+        },
+        "2": {
+          "count": 12,
+          "group_sum": 1554018,
+          "group_dr_actual": 6,
+          "group_dr_formula": 6,
+          "stable": false,
+          "mod3": null,
+          "mod9": 3
+        },
+        "3": {
+          "count": 9,
+          "group_sum": 1207125,
+          "group_dr_actual": 9,
+          "group_dr_formula": 9,
+          "stable": false,
+          "mod3": 0,
+          "mod9": null
+        },
+        "4": {
+          "count": 13,
+          "group_sum": 1873222,
+          "group_dr_actual": 7,
+          "group_dr_formula": 7,
+          "stable": false,
+          "mod3": null,
+          "mod9": 4
+        },
+        "5": {
+          "count": 11,
+          "group_sum": 1553446,
+          "group_dr_actual": 1,
+          "group_dr_formula": 1,
+          "stable": false,
+          "mod3": null,
+          "mod9": 2
+        },
+        "6": {
+          "count": 13,
+          "group_sum": 2306319,
+          "group_dr_actual": 6,
+          "group_dr_formula": 6,
+          "stable": true,
+          "mod3": 1,
+          "mod9": null
+        },
+        "7": {
+          "count": 16,
+          "group_sum": 2730928,
+          "group_dr_actual": 4,
+          "group_dr_formula": 4,
+          "stable": false,
+          "mod3": null,
+          "mod9": 7
+        },
+        "8": {
+          "count": 15,
+          "group_sum": 1948080,
+          "group_dr_actual": 3,
+          "group_dr_formula": 3,
+          "stable": false,
+          "mod3": null,
+          "mod9": 6
+        },
+        "9": {
+          "count": 19,
+          "group_sum": 2741769,
+          "group_dr_actual": 9,
+          "group_dr_formula": 9,
+          "stable": true,
+          "mod3": null,
+          "mod9": null
+        }
+      },
+      "dr_counts": {
+        "1": 6,
+        "3": 9,
+        "6": 13,
+        "8": 15,
+        "7": 16,
+        "2": 12,
+        "5": 11,
+        "9": 19,
+        "4": 13
+      }
+    },
+    "text_c": {
+      "identity": "المعلقات السبع",
+      "n_units": 78,
+      "t_map": {
+        "1": {
+          "count": 2,
+          "group_sum": 9353,
+          "group_dr_actual": 2,
+          "group_dr_formula": 2,
+          "stable": false,
+          "mod3": null,
+          "mod9": 2
+        },
+        "2": {
+          "count": 5,
+          "group_sum": 16624,
+          "group_dr_actual": 1,
+          "group_dr_formula": 1,
+          "stable": false,
+          "mod3": null,
+          "mod9": 5
+        },
+        "3": {
+          "count": 8,
+          "group_sum": 23964,
+          "group_dr_actual": 6,
+          "group_dr_formula": 6,
+          "stable": false,
+          "mod3": 2,
+          "mod9": null
+        },
+        "4": {
+          "count": 8,
+          "group_sum": 16394,
+          "group_dr_actual": 5,
+          "group_dr_formula": 5,
+          "stable": false,
+          "mod3": null,
+          "mod9": 8
+        },
+        "5": {
+          "count": 9,
+          "group_sum": 33426,
+          "group_dr_actual": 9,
+          "group_dr_formula": 9,
+          "stable": false,
+          "mod3": null,
+          "mod9": 0
+        },
+        "6": {
+          "count": 12,
+          "group_sum": 37134,
+          "group_dr_actual": 9,
+          "group_dr_formula": 9,
+          "stable": false,
+          "mod3": 0,
+          "mod9": null
+        },
+        "7": {
+          "count": 12,
+          "group_sum": 37236,
+          "group_dr_actual": 3,
+          "group_dr_formula": 3,
+          "stable": false,
+          "mod3": null,
+          "mod9": 3
+        },
+        "8": {
+          "count": 14,
+          "group_sum": 43762,
+          "group_dr_actual": 4,
+          "group_dr_formula": 4,
+          "stable": false,
+          "mod3": null,
+          "mod9": 5
+        },
+        "9": {
+          "count": 8,
+          "group_sum": 22374,
+          "group_dr_actual": 9,
+          "group_dr_formula": 9,
+          "stable": true,
+          "mod3": null,
+          "mod9": null
+        }
+      },
+      "dr_counts": {
+        "8": 14,
+        "3": 8,
+        "5": 9,
+        "7": 12,
+        "2": 5,
+        "9": 8,
+        "6": 12,
+        "4": 8,
+        "1": 2
+      }
+    }
+  },
+  "monte_carlo_114": {
+    "p_369_all_stable": 0.111229,
+    "p_exact_pattern_369_only": 0.053552,
+    "n_simulations": 1000000
+  },
+  "monte_carlo_78": {
+    "p_369_all_stable": 0.111199,
+    "p_exact_pattern_369_only": 0.050916,
+    "n_simulations": 1000000
+  }
+}

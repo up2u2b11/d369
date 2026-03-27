@@ -1,0 +1,211 @@
+{
+  "experiment": "g14_self_preservation_verification",
+  "date": "2026-03-27T11:25:07.965303+03:00",
+  "method": "permutation_test_100k",
+  "results": {
+    "text_a": {
+      "identity": "القرآن الكريم",
+      "n_units": 114,
+      "t_map": {
+        "1": {
+          "count": 14,
+          "group_sum": 2937227,
+          "group_root": 5,
+          "stable": false
+        },
+        "2": {
+          "count": 6,
+          "group_sum": 111216,
+          "group_root": 3,
+          "stable": false
+        },
+        "3": {
+          "count": 13,
+          "group_sum": 3210951,
+          "group_root": 3,
+          "stable": true
+        },
+        "4": {
+          "count": 13,
+          "group_sum": 1026997,
+          "group_root": 7,
+          "stable": false
+        },
+        "5": {
+          "count": 15,
+          "group_sum": 3588834,
+          "group_root": 3,
+          "stable": false
+        },
+        "6": {
+          "count": 10,
+          "group_sum": 2642856,
+          "group_root": 6,
+          "stable": true
+        },
+        "7": {
+          "count": 16,
+          "group_sum": 4054693,
+          "group_root": 4,
+          "stable": false
+        },
+        "8": {
+          "count": 15,
+          "group_sum": 2755353,
+          "group_root": 3,
+          "stable": false
+        },
+        "9": {
+          "count": 12,
+          "group_sum": 3147993,
+          "group_root": 9,
+          "stable": true
+        }
+      },
+      "permutation": {
+        "observed_stable": 3,
+        "observed_369_stable": 3,
+        "observed_369_present": 3,
+        "p_all_stable": 1.0,
+        "p_369_stable": 1.0,
+        "n_permutations": 100000
+      }
+    },
+    "text_b": {
+      "identity": "صحيح البخاري",
+      "n_units": 114,
+      "t_map": {
+        "1": {
+          "count": 6,
+          "group_sum": 1279545,
+          "group_root": 6,
+          "stable": false
+        },
+        "2": {
+          "count": 12,
+          "group_sum": 1554018,
+          "group_root": 6,
+          "stable": false
+        },
+        "3": {
+          "count": 9,
+          "group_sum": 1207125,
+          "group_root": 9,
+          "stable": false
+        },
+        "4": {
+          "count": 13,
+          "group_sum": 1873222,
+          "group_root": 7,
+          "stable": false
+        },
+        "5": {
+          "count": 11,
+          "group_sum": 1553446,
+          "group_root": 1,
+          "stable": false
+        },
+        "6": {
+          "count": 13,
+          "group_sum": 2306319,
+          "group_root": 6,
+          "stable": true
+        },
+        "7": {
+          "count": 16,
+          "group_sum": 2730928,
+          "group_root": 4,
+          "stable": false
+        },
+        "8": {
+          "count": 15,
+          "group_sum": 1948080,
+          "group_root": 3,
+          "stable": false
+        },
+        "9": {
+          "count": 19,
+          "group_sum": 2741769,
+          "group_root": 9,
+          "stable": true
+        }
+      },
+      "permutation": {
+        "observed_stable": 2,
+        "observed_369_stable": 2,
+        "observed_369_present": 3,
+        "p_all_stable": 1.0,
+        "p_369_stable": 1.0,
+        "n_permutations": 100000
+      }
+    },
+    "text_c": {
+      "identity": "المعلقات السبع",
+      "n_units": 78,
+      "t_map": {
+        "1": {
+          "count": 2,
+          "group_sum": 9353,
+          "group_root": 2,
+          "stable": false
+        },
+        "2": {
+          "count": 5,
+          "group_sum": 16624,
+          "group_root": 1,
+          "stable": false
+        },
+        "3": {
+          "count": 8,
+          "group_sum": 23964,
+          "group_root": 6,
+          "stable": false
+        },
+        "4": {
+          "count": 8,
+          "group_sum": 16394,
+          "group_root": 5,
+          "stable": false
+        },
+        "5": {
+          "count": 9,
+          "group_sum": 33426,
+          "group_root": 9,
+          "stable": false
+        },
+        "6": {
+          "count": 12,
+          "group_sum": 37134,
+          "group_root": 9,
+          "stable": false
+        },
+        "7": {
+          "count": 12,
+          "group_sum": 37236,
+          "group_root": 3,
+          "stable": false
+        },
+        "8": {
+          "count": 14,
+          "group_sum": 43762,
+          "group_root": 4,
+          "stable": false
+        },
+        "9": {
+          "count": 8,
+          "group_sum": 22374,
+          "group_root": 9,
+          "stable": true
+        }
+      },
+      "permutation": {
+        "observed_stable": 1,
+        "observed_369_stable": 1,
+        "observed_369_present": 3,
+        "p_all_stable": 1.0,
+        "p_369_stable": 1.0,
+        "n_permutations": 100000
+      }
+    }
+  }
+}

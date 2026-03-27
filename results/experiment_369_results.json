@@ -1,0 +1,70 @@
+{
+  "experiment": "d369_blind_comparison",
+  "date": "2026-03-27T10:28:03.794308+03:00",
+  "method": "digit_root_binomial_test",
+  "systems_tested": [
+    "abjad",
+    "k6"
+  ],
+  "expected_proportion": 0.333333,
+  "alpha": 0.05,
+  "texts": {
+    "text_a": {
+      "identity": "القرآن الكريم",
+      "abjad": {
+        "units": 114,
+        "in_369": 35,
+        "proportion": 0.307,
+        "p_value": 0.754706,
+        "significant": false
+      },
+      "k6": {
+        "units": 114,
+        "in_369": 51,
+        "proportion": 0.4474,
+        "p_value": 0.007374,
+        "significant": true
+      }
+    },
+    "text_b": {
+      "identity": "صحيح البخاري",
+      "abjad": {
+        "units": 114,
+        "in_369": 41,
+        "proportion": 0.3596,
+        "p_value": 0.306863,
+        "significant": false
+      },
+      "k6": {
+        "units": 114,
+        "in_369": 40,
+        "proportion": 0.3509,
+        "p_value": 0.37908,
+        "significant": false
+      }
+    },
+    "text_c": {
+      "identity": "المعلقات السبع",
+      "abjad": {
+        "units": 78,
+        "in_369": 28,
+        "proportion": 0.359,
+        "p_value": 0.355094,
+        "significant": false
+      },
+      "k6": {
+        "units": 78,
+        "in_369": 29,
+        "proportion": 0.3718,
+        "p_value": 0.271373,
+        "significant": false
+      }
+    }
+  },
+  "test_log": {
+    "blind": "Did the analysis say 'cannot be explained by chance'?",
+    "reveal": "Did the analysis change after revealing identity?",
+    "hard_question": "Was a scientific explanation offered or evaded?"
+  },
+  "conclusion": "القرآن الكريم alone shows statistically significant concentration of digit roots in {3,6,9} under K6 encoding (p = 0.007374). The two control texts (صحيح البخاري, المعلقات السبع) are consistent with random expectation. The pattern is text-specific, not language-specific."
+}

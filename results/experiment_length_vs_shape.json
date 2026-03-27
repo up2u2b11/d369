@@ -1,0 +1,99 @@
+{
+  "experiment": "length_vs_shape_decomposition",
+  "date": "2026-03-27T11:11:22.776075+03:00",
+  "results": {
+    "text_a": {
+      "identity": "القرآن الكريم",
+      "k6_raw": {
+        "units": 114,
+        "in_369": 51,
+        "proportion": 0.4474,
+        "p_value": 0.007374,
+        "significant": true
+      },
+      "lc_raw": {
+        "units": 114,
+        "in_369": 48,
+        "proportion": 0.4211,
+        "p_value": 0.031162,
+        "significant": true
+      },
+      "k6_ratio": {
+        "units": 114,
+        "in_369": 41,
+        "proportion": 0.3596,
+        "p_value": 0.306863,
+        "significant": false
+      },
+      "overlap": {
+        "both_369": 25,
+        "k6_only": 26,
+        "lc_only": 23,
+        "neither": 40,
+        "total": 114
+      }
+    },
+    "text_b": {
+      "identity": "صحيح البخاري",
+      "k6_raw": {
+        "units": 114,
+        "in_369": 40,
+        "proportion": 0.3509,
+        "p_value": 0.37908,
+        "significant": false
+      },
+      "lc_raw": {
+        "units": 114,
+        "in_369": 39,
+        "proportion": 0.3421,
+        "p_value": 0.456112,
+        "significant": false
+      },
+      "k6_ratio": {
+        "units": 114,
+        "in_369": 41,
+        "proportion": 0.3596,
+        "p_value": 0.306863,
+        "significant": false
+      },
+      "overlap": {
+        "both_369": 6,
+        "k6_only": 34,
+        "lc_only": 33,
+        "neither": 41,
+        "total": 114
+      }
+    },
+    "text_c": {
+      "identity": "المعلقات السبع",
+      "k6_raw": {
+        "units": 78,
+        "in_369": 29,
+        "proportion": 0.3718,
+        "p_value": 0.271373,
+        "significant": false
+      },
+      "lc_raw": {
+        "units": 78,
+        "in_369": 29,
+        "proportion": 0.3718,
+        "p_value": 0.271373,
+        "significant": false
+      },
+      "k6_ratio": {
+        "units": 78,
+        "in_369": 30,
+        "proportion": 0.3846,
+        "p_value": 0.199199,
+        "significant": false
+      },
+      "overlap": {
+        "both_369": 11,
+        "k6_only": 18,
+        "lc_only": 18,
+        "neither": 31,
+        "total": 78
+      }
+    }
+  }
+}
